@@ -17,7 +17,7 @@ import android.util.Log;
 public class Planner {
     private static final String TAG = "Planner";
     private static Planner instance = null;
-    private boolean mUseMockData = false;
+    private final static boolean mUseMockData = true;
     /**
      * Needed to keep track of which routes to remove when getting earlier and
      * later routes. Later on we will return the full set then this will be removed.

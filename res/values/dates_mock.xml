@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="dates">
+        <item>i dag torsdag</item>
+        <item>i morgon fredag</item>
+        <item>31 oktober l&#246;rdag</item>
+        <item>01 november s&#246;ndag</item>
+        <item>02 november m&#229;ndag</item>
+        <item>03 november tisdag</item>
+        <item>04 november onsdag</item>
+        <item>05 november torsdag</item>
+        <item>06 november fredag</item>
+        <item>07 november l&#246;rdag</item>
+        <item>08 november s&#246;ndag</item>
+        <item>09 november m&#229;ndag</item>
+        <item>10 november tisdag</item>
+        <item>11 november onsdag</item>
+        <item>12 november torsdag</item>
+        <item>13 november fredag</item>
+        <item>14 november l&#246;rdag</item>
+        <item>15 november s&#246;ndag</item>
+        <item>16 november m&#229;ndag</item>
+        <item>17 november tisdag</item>
+        <item>18 november onsdag</item>
+        <item>19 november torsdag</item>
+        <item>20 november fredag</item>
+        <item>21 november l&#246;rdag</item>
+        <item>22 november s&#246;ndag</item>
+        <item>23 november m&#229;ndag</item>
+        <item>24 november tisdag</item>
+        <item>25 november onsdag</item>
+        <item>26 november torsdag</item>
+        <item>27 november fredag</item>
+        <item>28 november l&#246;rdag</item>
+    </string-array>
+</resources>

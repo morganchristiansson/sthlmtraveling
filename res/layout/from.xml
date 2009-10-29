@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content" android:orientation="vertical">
+
+	<AutoCompleteTextView
+		    	android:id="@+id/from"
+				android:hint="@string/from"
+				android:dropDownWidth="fill_parent"
+				android:layout_width="wrap_content"
+           		android:layout_height="wrap_content"
+           		android:singleLine="true"/>
+
+	<Button android:text="@+id/Button01" android:id="@+id/Button01" android:layout_width="fill_parent" android:layout_height="wrap_content" />
+	<ListView android:id="@+id/ListView01" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+</LinearLayout>

@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -40,62 +41,88 @@ public class SearchActivity extends Activity {
     private static final int DIALOG_ABOUT = 3;
     private static final int DIALOG_PROGRESS = 4;
 
-    private AutoCompleteTextView mFromAutoComplete;
-    private AutoCompleteTextView mToAutoComplete;
+//    private AutoCompleteTextView mFromAutoComplete;
+//    private AutoCompleteTextView mToAutoComplete;
 
     private final Handler mHandler = new Handler();
+	private Button _fromBtn;
+	private Button _toBtn;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search);
 
-        Planner planner = Planner.getInstance();
-        mFromAutoComplete = (AutoCompleteTextView) findViewById(R.id.from);
-        AutoCompleteStopAdapter stopAdapter = new AutoCompleteStopAdapter(this, 
-                android.R.layout.simple_dropdown_item_1line, planner);
-        mFromAutoComplete.setAdapter(stopAdapter);
+        final Button when = (Button)findViewById(R.id.when);
+        when.setOnClickListener(_whenListener);
 
-        mToAutoComplete = (AutoCompleteTextView) findViewById(R.id.to);
-        AutoCompleteStopAdapter toAdapter = new AutoCompleteStopAdapter(this, 
-                android.R.layout.simple_dropdown_item_1line, planner);
-        mToAutoComplete.setAdapter(toAdapter);
+        Planner planner = Planner.getInstance();
+//        mFromAutoComplete = (AutoCompleteTextView) findViewById(R.id.from);
+//        AutoCompleteStopAdapter stopAdapter = new AutoCompleteStopAdapter(this, 
+//                android.R.layout.simple_dropdown_item_1line, planner);
+//        mFromAutoComplete.setAdapter(stopAdapter);
+//
+//        mToAutoComplete = (AutoCompleteTextView) findViewById(R.id.to);
+//        AutoCompleteStopAdapter toAdapter = new AutoCompleteStopAdapter(this, 
+//                android.R.layout.simple_dropdown_item_1line, planner);
+//        mToAutoComplete.setAdapter(toAdapter);
 
         final Button search = (Button) findViewById(R.id.search_route);
 
         search.setOnClickListener(mGetSearchListener);
-
-        final ImageButton fromDialog = (ImageButton) findViewById(R.id.from_menu);
-        fromDialog.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog(DIALOG_START_POINT);
-            }
-        });
-
-        final ImageButton toDialog = (ImageButton) findViewById(R.id.to_menu);
-        toDialog.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog(DIALOG_END_POINT);
-            }
-        });
+        _fromBtn = (Button)findViewById(R.id.from);
+        _toBtn = (Button)findViewById(R.id.to);
+        _fromBtn.setOnClickListener(_fromListener);
+        _toBtn.setOnClickListener(_toListener);
+//        final ImageButton fromDialog = (ImageButton) findViewById(R.id.from_menu);
+//        fromDialog.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                showDialog(DIALOG_START_POINT);
+//            }
+//        });
+//
+//        final ImageButton toDialog = (ImageButton) findViewById(R.id.to_menu);
+//        toDialog.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                showDialog(DIALOG_END_POINT);
+//            }
+//        });
     }
 
     View.OnClickListener mGetSearchListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (mFromAutoComplete.getText().length() <= 0) {
-                mFromAutoComplete.setError(getText(R.string.empty_value));
-            } else if (mToAutoComplete.getText().length() <= 0) {
-                mToAutoComplete.setError(getText(R.string.empty_value));
-            } else {
-                Time time = new Time();
-                time.setToNow();
-                searchRoutes(mFromAutoComplete.getText().toString(), 
-                        mToAutoComplete.getText().toString(), time);
-            }
+//            if (mFromAutoComplete.getText().length() <= 0) {
+//                mFromAutoComplete.setError(getText(R.string.empty_value));
+//            } else if (mToAutoComplete.getText().length() <= 0) {
+//                mToAutoComplete.setError(getText(R.string.empty_value));
+//            } else {
+//                Time time = new Time();
+//                time.setToNow();
+//                searchRoutes(mFromAutoComplete.getText().toString(), 
+//                        mToAutoComplete.getText().toString(), time);
+//            }
         }
     };
+	private View.OnClickListener _whenListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			startActivity(new Intent(SearchActivity.this, WhenActivity.class));
+		}
+	};
+	View.OnClickListener _fromListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			startActivity(new Intent(SearchActivity.this, FromActivity.class));
+		}
+	};
+	View.OnClickListener _toListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			startActivity(new Intent(SearchActivity.this, ToActivity.class));
+		}
+	};
 
     /**
      * Fires off a thread to do the query. Will call onSearchResult when done.
@@ -104,66 +131,66 @@ public class SearchActivity extends Activity {
      */
     private void searchRoutes(final String startPoint, final String endPoint, final Time time) {
         showDialog(DIALOG_PROGRESS);
-        new Thread() {
-            public void run() {
-                try {
-                    Planner.getInstance().findRoutes(startPoint, endPoint, time);
-                    mHandler.post(new Runnable() {
-                        @Override public void run() {
-                            onSearchRoutesResult();
-                        }
-                    });
-                    dismissDialog(DIALOG_PROGRESS);
-                } catch (Exception e) {
-                    dismissDialog(DIALOG_PROGRESS);
-                }
-            }
-        }.start();
+//        new Thread() {
+//            public void run() {
+//                try {
+//                    Planner.getInstance().findRoutes(startPoint, endPoint, time);
+//                    mHandler.post(new Runnable() {
+//                        @Override public void run() {
+//                            onSearchRoutesResult();
+//                        }
+//                    });
+//                    dismissDialog(DIALOG_PROGRESS);
+//                } catch (Exception e) {
+//                    dismissDialog(DIALOG_PROGRESS);
+//                }
+//            }
+//        }.start();
     }
 
     /**
      * Called when we have a search result for routes.
      */
-    private void onSearchRoutesResult() {
-        if (Planner.getInstance().lastFoundRoutes() != null 
-                && !Planner.getInstance().lastFoundRoutes().isEmpty()) {
-            Intent i = new Intent(SearchActivity.this, RoutesActivity.class);
-            i.putExtra("com.markupartist.sthlmtraveling.startPoint", 
-                    mFromAutoComplete.getText().toString());
-            i.putExtra("com.markupartist.sthlmtraveling.endPoint", 
-                    mToAutoComplete.getText().toString());
-            startActivity(i);
-        } else {
-            // TODO: This works for now, but we need to see if there are any
-            // alternative stops available in later on.
-            showDialog(DIALOG_NO_ROUTES_FOUND);
-        }
-    }
+//    private void onSearchRoutesResult() {
+//        if (Planner.getInstance().lastFoundRoutes() != null 
+//                && !Planner.getInstance().lastFoundRoutes().isEmpty()) {
+//            Intent i = new Intent(SearchActivity.this, RoutesActivity.class);
+//            i.putExtra("com.markupartist.sthlmtraveling.startPoint", 
+//                    mFromAutoComplete.getText().toString());
+//            i.putExtra("com.markupartist.sthlmtraveling.endPoint", 
+//                    mToAutoComplete.getText().toString());
+//            startActivity(i);
+//        } else {
+//            // TODO: This works for now, but we need to see if there are any
+//            // alternative stops available in later on.
+//            showDialog(DIALOG_NO_ROUTES_FOUND);
+//        }
+//    }
 
     @Override
     protected Dialog onCreateDialog(int id) {
         Dialog dialog = null;
         switch(id) {
-        case DIALOG_START_POINT:
-            AlertDialog.Builder startPointDialogBuilder = new AlertDialog.Builder(this);
-            startPointDialogBuilder.setTitle("Choose start point");
-            startPointDialogBuilder.setItems(getMyLocationItems(), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int item) {
-                    mFromAutoComplete.setText(getAddressFromCurrentPosition());
-                }
-            });
-            dialog = startPointDialogBuilder.create();
-            break;
-        case DIALOG_END_POINT:
-            AlertDialog.Builder endPointDialogBuilder = new AlertDialog.Builder(this);
-            endPointDialogBuilder.setTitle("Choose end point");
-            endPointDialogBuilder.setItems(getMyLocationItems(), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int item) {
-                    mToAutoComplete.setText(getAddressFromCurrentPosition());
-                }
-            });
-            dialog = endPointDialogBuilder.create();
-            break;
+//        case DIALOG_START_POINT:
+//            AlertDialog.Builder startPointDialogBuilder = new AlertDialog.Builder(this);
+//            startPointDialogBuilder.setTitle("Choose start point");
+//            startPointDialogBuilder.setItems(getMyLocationItems(), new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int item) {
+//                    mFromAutoComplete.setText(getAddressFromCurrentPosition());
+//                }
+//            });
+//            dialog = startPointDialogBuilder.create();
+//            break;
+//        case DIALOG_END_POINT:
+//            AlertDialog.Builder endPointDialogBuilder = new AlertDialog.Builder(this);
+//            endPointDialogBuilder.setTitle("Choose end point");
+//            endPointDialogBuilder.setItems(getMyLocationItems(), new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int item) {
+//                    mToAutoComplete.setText(getAddressFromCurrentPosition());
+//                }
+//            });
+//            dialog = endPointDialogBuilder.create();
+//            break;
         case DIALOG_NO_ROUTES_FOUND:
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             dialog = builder.setTitle("Unfortunately no routes was found")
