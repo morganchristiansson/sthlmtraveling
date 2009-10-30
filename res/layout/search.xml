@@ -21,6 +21,7 @@
 	<Button   android:id="@+id/when"
 	          android:layout_width="fill_parent" android:layout_height="wrap_content"/>
 
-	<Button   android:id="@+id/search_route" android:text="@string/search_route"
+	<Button   android:id="@+id/search_route" android:text="@string/search"
 	          android:layout_height="wrap_content" android:layout_width="fill_parent"/>
+
 </LinearLayout>
