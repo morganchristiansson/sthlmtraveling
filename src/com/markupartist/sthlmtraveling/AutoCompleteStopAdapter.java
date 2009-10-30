@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -23,7 +24,7 @@ public class AutoCompleteStopAdapter extends ArrayAdapter<String> implements Fil
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 if (constraint != null) {
-                    //Log.d(TAG, "Searching for " + constraint);
+                    Log.d(TAG, "Searching for " + constraint);
                     ArrayList<String> list = 
                         mPlanner.findStop(constraint.toString());
 
@@ -49,5 +50,4 @@ public class AutoCompleteStopAdapter extends ArrayAdapter<String> implements Fil
         };
         return nameFilter;
     }
-
 }

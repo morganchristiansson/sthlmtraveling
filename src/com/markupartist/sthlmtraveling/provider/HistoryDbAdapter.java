@@ -137,16 +137,34 @@ public class HistoryDbAdapter {
         return fetchByType(TYPE_END_POINT);        
     }
 
-    /**
+    public CharSequence fetchLastStartPoint() {
+    	Cursor cursor = fetchByType(TYPE_START_POINT, 1);
+    	cursor.moveToFirst();
+    	int index = cursor.getColumnIndex(KEY_NAME);
+		return cursor.getString(index);
+	}
+
+	public CharSequence fecthLastEndPoint() {
+    	Cursor cursor = fetchByType(TYPE_END_POINT, 1);
+    	cursor.moveToFirst();
+    	int index = cursor.getColumnIndex(KEY_NAME);
+		return cursor.getString(index);
+	}
+
+    private Cursor fetchByType(int type) {
+		return fetchByType(type, 10);
+	}
+
+	/**
      * Fetch all entries for a specific type.
      * @param type the type
      * @return a Cursor object
      */
-    public Cursor fetchByType(int type) {
+    private Cursor fetchByType(int type, int limit) {
         Cursor mCursor =
             mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,
                     KEY_TYPE, KEY_NAME}, KEY_TYPE + "=" + type, null,
-                    null, null, KEY_CREATED + " DESC", "10");
+                    null, null, KEY_CREATED + " DESC", String.valueOf(limit));
         return mCursor;        
     }
 
@@ -172,4 +190,5 @@ public class HistoryDbAdapter {
             onCreate(db);
         }
     }
+
 }

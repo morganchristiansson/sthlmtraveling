@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
     <string name="app_name">STHLM Traveling</string>
     <string name="from">From</string>
     <string name="to">To</string>
@@ -12,9 +11,8 @@
     <string name="new_search">Search</string>
     <string name="empty_value">Missing value</string>
     <string name="loading">Searching. Please wait...</string>
-    <string name="my_location">My location</string>
+    <string name="from_my_location">From my location</string>
     <string name="change_date_and_time">Change date &amp; time</string>
-    <string name="reverse_start_end">Reverse from &amp; to</string>
     <string name="about">About</string>
     <string name="about_this_app">STHLM Traveling is developed by Johan Nilsson, please contact him if you have ideas or experience any problems.\n\nAll data is gathered from SL - Stockholm Public Transport.\n\nIcons by Fredrik Broman, http://fredrikbroman.com.</string>
     <string name="donate">Donate</string>
@@ -23,5 +21,10 @@
     <string name="favorites_label">Favorites</string>
     <string name="no_favorites">No favorites yet...</string>
     <string name="when">When</string>
-    <string name="pick_contact">Pick contact</string>
+    <string name="pick_contact">Pick adress from contacts</string>
+    <string name="go">Go</string>
+    <string name="when_default">Now</string>
+    <string name="recent_locations">Recent locations</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
 </resources>
