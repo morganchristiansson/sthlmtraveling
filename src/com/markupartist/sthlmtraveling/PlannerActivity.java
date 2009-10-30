@@ -38,7 +38,7 @@ import android.widget.Toast;
 import com.markupartist.sthlmtraveling.SearchRoutesTask.OnSearchRoutesResultListener;
 import com.markupartist.sthlmtraveling.provider.HistoryDbAdapter;
 
-public class SearchActivity extends Activity implements OnSearchRoutesResultListener {
+public class PlannerActivity extends Activity implements OnSearchRoutesResultListener {
     private static final String TAG = "Search";
     private static final int DIALOG_START_POINT = 0;
     private static final int DIALOG_END_POINT = 1;
@@ -118,8 +118,8 @@ public class SearchActivity extends Activity implements OnSearchRoutesResultList
 //                time.setToNow();
 //
 //                SearchRoutesTask searchRoutesTask = 
-//                    new SearchRoutesTask(SearchActivity.this)
-//                        .setOnSearchRoutesResultListener(SearchActivity.this);
+//                    new SearchRoutesTask(PlannerActivity.this)
+//                        .setOnSearchRoutesResultListener(PlannerActivity.this);
 //                searchRoutesTask.execute(mFromAutoComplete.getText().toString(), 
 //                        mToAutoComplete.getText().toString(), time);
 //            }
@@ -128,19 +128,19 @@ public class SearchActivity extends Activity implements OnSearchRoutesResultList
 	private View.OnClickListener _whenListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			startActivity(new Intent(SearchActivity.this, WhenActivity.class));
+			startActivity(new Intent(PlannerActivity.this, WhenActivity.class));
 		}
 	};
 	View.OnClickListener _fromListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			startActivity(new Intent(SearchActivity.this, FromActivity.class));
+			startActivity(new Intent(PlannerActivity.this, FromActivity.class));
 		}
 	};
 	View.OnClickListener _toListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			startActivity(new Intent(SearchActivity.this, ToActivity.class));
+			startActivity(new Intent(PlannerActivity.this, ToActivity.class));
 		}
 	};
 
@@ -349,7 +349,7 @@ public class SearchActivity extends Activity implements OnSearchRoutesResultList
 //        mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_START_POINT, startPoint);
 //        mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_END_POINT, endPoint);
 //
-//        Intent i = new Intent(SearchActivity.this, RoutesActivity.class);
+//        Intent i = new Intent(PlannerActivity.this, RoutesActivity.class);
 //        i.putExtra("com.markupartist.sthlmtraveling.startPoint", startPoint);
 //        i.putExtra("com.markupartist.sthlmtraveling.endPoint", endPoint);
 //        startActivity(i);
