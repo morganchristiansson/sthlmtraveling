@@ -249,10 +249,10 @@ public class Planner {
     /**
      * Mocked stops xml
      */
-    private static final String mStopsXml = "<findStop generator='zend' version='1.0'><key_0>Telefonplan (Stockholm)</key_0><key_1>Telegramv둮en (Nacka)</key_1><key_2>Telemarksgr둵d (Stockholm)</key_2><key_3>Tellusborgsv둮en (Stockholm)</key_3><key_4>TEL</key_4><key_5>Telia (Stockholm)</key_5><key_6>Tellusv둮en (J둹f둳la)</key_6><key_7>Tellusgatan (Sigtuna)</key_7><key_8>Telgebo (S쉊ert둳je)</key_8><status>success</status></findStop>";
+    private static final String mStopsXml = "<findStop generator='zend' version='1.0'><key_0>Telefonplan (Stockholm)</key_0><key_1>Telegramv채gen (Nacka)</key_1><key_2>Telemarksgr채nd (Stockholm)</key_2><key_3>Tellusborgsv채gen (Stockholm)</key_3><key_4>TEL</key_4><key_5>Telia (Stockholm)</key_5><key_6>Tellusv채gen (J채rf채lla)</key_6><key_7>Tellusgatan (Sigtuna)</key_7><key_8>Telgebo (S철dert채lje)</key_8><status>success</status></findStop>";
 
     /**
      * Mocked route detail xml
      */
-    private static final String mRouteDetailXml = "<routeDetail generator='zend' version='1.0'><requestCount>3</requestCount><details><key_0>Take Bus - from Centralen (Klarabergsviad.) towards R똡huset.Your departure from Centralen (Klarabergsviad.) is at approx. 19:36, your arrival in R똡huset is at 19:40.</key_0><key_1>At R똡huset change to Metro blue line 10 towards Hjulsta.Your departure from R똡huset is at 19:45.You arrive in Tensta at 20:03.</key_1><key_2>The duration of your journey is 27 minutes.</key_2><key_3>Have a nice journey!</key_3></details><status>success</status></routeDetail>";
+    private static final String mRouteDetailXml = "<routeDetail generator='zend' version='1.0'><requestCount>3</requestCount><details><key_0>Take Bus - from Centralen (Klarabergsviad.) towards R책dhuset.Your departure from Centralen (Klarabergsviad.) is at approx. 19:36, your arrival in R책dhuset is at 19:40.</key_0><key_1>At R책dhuset change to Metro blue line 10 towards Hjulsta.Your departure from R책dhuset is at 19:45.You arrive in Tensta at 20:03.</key_1><key_2>The duration of your journey is 27 minutes.</key_2><key_3>Have a nice journey!</key_3></details><status>success</status></routeDetail>";
 }
