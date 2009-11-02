@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.text.format.Time;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -93,7 +94,8 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
              }
              if (mToButton.getText().length() <= 0) {
                  mToButton.setError(getText(R.string.empty_value));
-                 error=true;        }
+                 error=true;
+             }
              if(error) return;
              Time time = new Time();
              time.setToNow();
@@ -152,6 +154,16 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
         mHistoryDbAdapter.close();
     }
 
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.about:
+            startActivity(new Intent(this, AboutActivity.class));
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+ 
     @Override
     public void onSearchRoutesResult(ArrayList<Route> routes) {
         String startPoint = mFromButton.getText().toString();
