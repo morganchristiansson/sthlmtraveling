@@ -1,32 +1,34 @@
+/*
+ * Copyright (C) 2009 Johan Nilsson <http://markupartist.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.markupartist.sthlmtraveling;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import android.app.Activity;
-import android.content.Context;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
-import android.database.Cursor;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.format.Time;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 import com.markupartist.sthlmtraveling.FromToActivity.FromActivity;
 import com.markupartist.sthlmtraveling.FromToActivity.ToActivity;
@@ -35,127 +37,113 @@ import com.markupartist.sthlmtraveling.provider.HistoryDbAdapter;
 
 public class PlannerActivity extends Activity implements OnSearchRoutesResultListener {
     private static final String TAG = "Planner";
-	protected static final int ACTIVITY_FROM = 5;
-	protected static final int ACTIVITY_TO = 6;
-	protected static final int ACTIVITY_WHEN = 7;
+    protected static final int ACTIVITY_FROM = 5;
+    protected static final int ACTIVITY_TO = 6;
+    protected static final int ACTIVITY_WHEN = 7;
 
-	private Button mFromButton;
-	private Button mToButton;
+    private static final int NO_LOCATION = 5;
+
+    private Button mFromButton;
+    private Button mToButton;
+    private Button mSearchButton;
+    private Button mWhenButton;
+    private ImageButton mReverseButton;
     static HistoryDbAdapter mHistoryDbAdapter;
-	private Button _searchButton;
-	private Button _whenButton;
-	private ImageButton _reverseButton;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.planner);
 
-        _whenButton = (Button)findViewById(R.id.when);
-        _whenButton.setOnClickListener(_whenListener);
+        mWhenButton = (Button)findViewById(R.id.when);
+        mWhenButton.setOnClickListener(_whenListener);
         mHistoryDbAdapter = new HistoryDbAdapter(this).open();
 
-        _searchButton = (Button) findViewById(R.id.search_route);
-        _searchButton.setOnClickListener(_searchListener);
+        mSearchButton = (Button) findViewById(R.id.search_route);
+        mSearchButton.setOnClickListener(_searchListener);
         mFromButton = (Button)findViewById(R.id.from);
         mFromButton.setOnClickListener(_fromListener);
         mFromButton.setText(mHistoryDbAdapter.fetchLastStartPoint());
         mToButton = (Button)findViewById(R.id.to);
         mToButton.setOnClickListener(_toListener);
         mToButton.setText(mHistoryDbAdapter.fecthLastEndPoint());
-        
-        _reverseButton = (ImageButton)findViewById(R.id.reverse);
-        _reverseButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
+       
+        mReverseButton = (ImageButton)findViewById(R.id.reverse);
+        mReverseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 reverse();
-			}
-		});
+            }
+        });
     }
 
     protected void reverse() {
-    	String startPoint = mFromButton.getText().toString();
+        String startPoint = mFromButton.getText().toString();
         String endPoint = mToButton.getText().toString();
         mFromButton.setText(endPoint);
         mToButton.setText(startPoint);
     }
-
-	View.OnClickListener _searchListener = new View.OnClickListener() {
+    
+    View.OnClickListener _searchListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-        	boolean error = false;
-            if (mFromButton.getText().length() <= 0) {
-                mFromButton.setError(getText(R.string.empty_value));
-                error=true;
-            }
-            if (mToButton.getText().length() <= 0) {
-                mToButton.setError(getText(R.string.empty_value));
-                error=true;
-            }
-        	if(error) return;
-            Time time = new Time();
-            time.setToNow();
+             boolean error = false;
+             if (mFromButton.getText().length() <= 0) {
+                 mFromButton.setError(getText(R.string.empty_value));
+                 error=true;
+             }
+             if (mToButton.getText().length() <= 0) {
+                 mToButton.setError(getText(R.string.empty_value));
+                 error=true;        }
+             if(error) return;
+             Time time = new Time();
+             time.setToNow();
 
-            SearchRoutesTask searchRoutesTask = 
-                new SearchRoutesTask(PlannerActivity.this)
-                    .setOnSearchRoutesResultListener(PlannerActivity.this);
-            searchRoutesTask.execute(mFromButton.getText().toString(), 
-                    mToButton.getText().toString(), time);
+             SearchRoutesTask searchRoutesTask = 
+                 new SearchRoutesTask(PlannerActivity.this)
+                 .setOnSearchRoutesResultListener(PlannerActivity.this);
+             searchRoutesTask.execute(mFromButton.getText().toString(), 
+                  mToButton.getText().toString(), time);
         }
     };
-	private View.OnClickListener _whenListener = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			startActivityForResult(new Intent(PlannerActivity.this, WhenActivity.class), ACTIVITY_WHEN);
-		}
-	};
-	View.OnClickListener _fromListener = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			startActivityForResult(new Intent(PlannerActivity.this, FromActivity.class), ACTIVITY_FROM);
-		}
-	};
-	View.OnClickListener _toListener = new View.OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			startActivityForResult(new Intent(PlannerActivity.this, ToActivity.class), ACTIVITY_TO);
-		}
-	};
+    private View.OnClickListener _whenListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            startActivityForResult(new Intent(PlannerActivity.this, WhenActivity.class), ACTIVITY_WHEN);
+        }
+    };
+    View.OnClickListener _fromListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            startActivityForResult(new Intent(PlannerActivity.this, FromActivity.class), ACTIVITY_FROM);
+        }
+    };
+    View.OnClickListener _toListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            startActivityForResult(new Intent(PlannerActivity.this, ToActivity.class), ACTIVITY_TO);
+        }
+    };
 
     @Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if(resultCode != RESULT_OK) return;
-		switch(requestCode) {
-		case ACTIVITY_FROM:
-			mFromButton.setText(data.getCharSequenceExtra("com.markupartist.sthlmtraveling.startPoint"));
-			break;
-		case ACTIVITY_TO:
-			mToButton.setText(data.getCharSequenceExtra("com.markupartist.sthlmtraveling.endPoint"));
-			break;
-		case ACTIVITY_WHEN:
-			_whenButton.setText(data.getCharSequenceExtra("com.markupartist.sthlmtraveling.routeTime"));
-			break;
-		default:
-			Log.w(TAG, "Unhandled activity resultCode: "+resultCode);
-		}
-	}
+    protected Dialog onCreateDialog(int id) {
+        Dialog dialog = null;
+        switch(id) {
+        case NO_LOCATION:
+            return new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(getText(R.string.no_location_title))
+                .setMessage(getText(R.string.no_location_message))
+                .setPositiveButton(android.R.string.ok, null)
+                .create();
+        }
+        return dialog;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu_search, menu);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.about:
-            startActivity(new Intent(this, AboutActivity.class));
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override

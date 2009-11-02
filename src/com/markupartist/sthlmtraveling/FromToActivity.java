@@ -20,8 +20,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
-
 import com.markupartist.sthlmtraveling.provider.HistoryDbAdapter;
 
 public abstract class FromToActivity extends Activity {
@@ -99,25 +97,33 @@ public abstract class FromToActivity extends Activity {
             super.finish();
         }
     }
-    private static String getAddressFromCurrentPosition(Context context) {
-        final LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+    /**
+     * Get address from the current position.
+     * TODO: Extract to a class
+     * @param fromActivity 
+     * @return the address in the format "location name, street" or null if failed
+     * to determine address 
+     */
+    private static String getAddressFromCurrentPosition(FromActivity activity) {
+        final LocationManager lm = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
         Location loc = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         Location gpsLoc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         if (loc == null && gpsLoc != null) {
             loc = gpsLoc;
         } else if (gpsLoc != null && gpsLoc.getTime() > loc.getTime()) {
-            // If the gps location is more recent than the network 
+            // If we the gps location is more recent than the network 
             // location use it.
             loc = gpsLoc;
-        } else {
-            Toast.makeText(context, "Could not determine your position", 10);
+        }
+
+        if (loc == null) {
             return null;
         }
 
         Double lat = loc.getLatitude();
         Double lng = loc.getLongitude();
-        Geocoder geocoder = new Geocoder(context.getApplicationContext(), Locale.getDefault());
+        Geocoder geocoder = new Geocoder(activity.getApplicationContext(), Locale.getDefault());
         String addressString = null;
         try {
             Log.d(TAG, "Getting address from position " + lat + "," + lng);
@@ -149,10 +155,9 @@ public abstract class FromToActivity extends Activity {
                 }
             }
         } catch (IOException e) {
-            // TODO: Change to dialog
-            Toast.makeText(context, "Could not determine your position", 10);
             Log.e(TAG, e.getMessage());
         }
         return addressString;
     }
+
 }
