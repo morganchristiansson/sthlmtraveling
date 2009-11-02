@@ -6,20 +6,13 @@ import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.format.Time;
@@ -28,7 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -42,18 +35,14 @@ import com.markupartist.sthlmtraveling.provider.HistoryDbAdapter;
 
 public class PlannerActivity extends Activity implements OnSearchRoutesResultListener {
     private static final String TAG = "Search";
-    private static final int DIALOG_START_POINT = 0;
-    private static final int DIALOG_END_POINT = 1;
     private static final int DIALOG_ABOUT = 2;
-    private static final int DIALOG_START_POINT_HISTORY = 3;
-    private static final int DIALOG_END_POINT_HISTORY = 4;
 	protected static final int ACTIVITY_FROM = 5;
 	protected static final int ACTIVITY_TO = 6;
 	protected static final int ACTIVITY_WHEN = 7;
 
     private final Handler mHandler = new Handler();
-	private Button _fromButton;
-	private Button _toButton;
+	private Button mFromButton;
+	private Button mToButton;
     private static HistoryDbAdapter mHistoryDbAdapter;
 	private Button _searchButton;
 	private Button _whenButton;
@@ -69,12 +58,12 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
 
         _searchButton = (Button) findViewById(R.id.search_route);
         _searchButton.setOnClickListener(_searchListener);
-        _fromButton = (Button)findViewById(R.id.from);
-        _fromButton.setOnClickListener(_fromListener);
-        _fromButton.setText(mHistoryDbAdapter.fetchLastStartPoint());
-        _toButton = (Button)findViewById(R.id.to);
-        _toButton.setOnClickListener(_toListener);
-        _toButton.setText(mHistoryDbAdapter.fecthLastEndPoint());
+        mFromButton = (Button)findViewById(R.id.from);
+        mFromButton.setOnClickListener(_fromListener);
+        mFromButton.setText(mHistoryDbAdapter.fetchLastStartPoint());
+        mToButton = (Button)findViewById(R.id.to);
+        mToButton.setOnClickListener(_toListener);
+        mToButton.setText(mHistoryDbAdapter.fecthLastEndPoint());
         
         _reverseButton = (ImageButton)findViewById(R.id.reverse);
         _reverseButton.setOnClickListener(new View.OnClickListener() {
@@ -86,22 +75,22 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
     }
 
     protected void reverse() {
-    	String startPoint = _fromButton.getText().toString();
-        String endPoint = _toButton.getText().toString();
-        _fromButton.setText(endPoint);
-        _toButton.setText(startPoint);
+    	String startPoint = mFromButton.getText().toString();
+        String endPoint = mToButton.getText().toString();
+        mFromButton.setText(endPoint);
+        mToButton.setText(startPoint);
     }
 
 	View.OnClickListener _searchListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
         	boolean error = false;
-            if (_fromButton.getText().length() <= 0) {
-                _fromButton.setError(getText(R.string.empty_value));
+            if (mFromButton.getText().length() <= 0) {
+                mFromButton.setError(getText(R.string.empty_value));
                 error=true;
             }
-            if (_toButton.getText().length() <= 0) {
-                _toButton.setError(getText(R.string.empty_value));
+            if (mToButton.getText().length() <= 0) {
+                mToButton.setError(getText(R.string.empty_value));
                 error=true;
             }
         	if(error) return;
@@ -111,8 +100,8 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
             SearchRoutesTask searchRoutesTask = 
                 new SearchRoutesTask(PlannerActivity.this)
                     .setOnSearchRoutesResultListener(PlannerActivity.this);
-            searchRoutesTask.execute(_fromButton.getText().toString(), 
-                    _toButton.getText().toString(), time);
+            searchRoutesTask.execute(mFromButton.getText().toString(), 
+                    mToButton.getText().toString(), time);
         }
     };
 	private View.OnClickListener _whenListener = new View.OnClickListener() {
@@ -137,12 +126,13 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
     @Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		if(resultCode != RESULT_OK) return;
 		switch(requestCode) {
 		case ACTIVITY_FROM:
-			_fromButton.setText(data.getCharSequenceExtra("com.markupartist.sthlmtraveling.startPoint"));
+			mFromButton.setText(data.getCharSequenceExtra("com.markupartist.sthlmtraveling.startPoint"));
 			break;
 		case ACTIVITY_TO:
-			_toButton.setText(data.getCharSequenceExtra("com.markupartist.sthlmtraveling.endPoint"));
+			mToButton.setText(data.getCharSequenceExtra("com.markupartist.sthlmtraveling.endPoint"));
 			break;
 		case ACTIVITY_WHEN:
 			_whenButton.setText(data.getCharSequenceExtra("com.markupartist.sthlmtraveling.routeTime"));
@@ -151,52 +141,6 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
 			Log.w(TAG, "Unhandled activity resultCode: "+resultCode);
 		}
 	}
-
-	@Override
-    protected Dialog onCreateDialog(int id) {
-        Dialog dialog = null;
-        switch(id) {
-        case DIALOG_ABOUT:
-            PackageManager pm = getPackageManager();
-            String version = "";
-            try {
-                PackageInfo pi = pm.getPackageInfo(this.getPackageName(), 0);
-                version = pi.versionName;
-            } catch (NameNotFoundException e) {
-                Log.e(TAG, "Could not get the package info.");
-            }
-
-            return new AlertDialog.Builder(this)
-                .setTitle(getText(R.string.app_name) + " " + version)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setMessage(getText(R.string.about_this_app))
-                .setCancelable(true)
-                .setPositiveButton(getText(android.R.string.ok), null)
-                .setNeutralButton(getText(R.string.donate), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                                Uri.parse("http://pledgie.com/campaigns/6527"));
-                        startActivity(browserIntent);
-                    }
-                })
-                .setNegativeButton(getText(R.string.feedback), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-                        emailIntent .setType("plain/text");
-                        emailIntent .putExtra(android.content.Intent.EXTRA_EMAIL,
-                                new String[]{"sthlmtraveling@markupartist.com"});
-                        emailIntent .putExtra(android.content.Intent.EXTRA_SUBJECT,
-                                "iglaset feedback");
-                        startActivity(Intent.createChooser(emailIntent,
-                                getText(R.string.send_email)));
-                    }
-                })
-                .create();
-        }
-        return dialog;
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -265,11 +209,12 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.about:
-                showDialog(DIALOG_ABOUT);
-                return true;
+        case R.id.about:
+            startActivity(new Intent(this, AboutActivity.class));
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -280,58 +225,54 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
 
     @Override
     public void onSearchRoutesResult(ArrayList<Route> routes) {
-        String startPoint = _fromButton.getText().toString();
-        String endPoint = _toButton.getText().toString();
+        String startPoint = mFromButton.getText().toString();
+        String endPoint = mToButton.getText().toString();
 
         mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_START_POINT, startPoint);
         mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_END_POINT, endPoint);
 
-        Intent i = new Intent(PlannerActivity.this, RoutesActivity.class);
+        Intent i = new Intent(this, RoutesActivity.class);
         i.putExtra("com.markupartist.sthlmtraveling.startPoint", startPoint);
         i.putExtra("com.markupartist.sthlmtraveling.endPoint", endPoint);
         startActivity(i);
     }
     public abstract static class FromToActivity extends Activity {
-		protected Button _goButton;
-		protected AutoCompleteTextView _text;
-		protected ListView _recent;
+		protected AutoCompleteTextView mText;
+		protected ListView mRecent;
 		@Override
 		protected void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-			_text = (AutoCompleteTextView)findViewById(R.id.text);
-	        _goButton = (Button) findViewById(R.id.go);
-	        _goButton.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					finish();
-				}
-			});
-	        _text.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			mText = (AutoCompleteTextView)findViewById(R.id.text);
+	        mText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					finish();
+					finishOK();
 				}
 			});
 
-        	final Cursor cursor = getCursor();
+        	final Cursor cursor = mHistoryDbAdapter.fetchAllPoints();
         	startManagingCursor(cursor);
         	Log.d(TAG, "start/endPoints: " + cursor.getCount());
-        	_recent = (ListView)findViewById(R.id.recent);
-        	_recent.setAdapter(new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1,
+        	mRecent = (ListView)findViewById(R.id.recent);
+        	mRecent.setAdapter(new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1,
         		cursor, new String[]{HistoryDbAdapter.KEY_NAME}, new int[]{android.R.id.text1}));
-        	_recent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        	mRecent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		    	@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		    		int index = cursor.getColumnIndex(HistoryDbAdapter.KEY_NAME);
-		    		_text.setText(cursor.getString(index));
-		    		finish();
+		    		mText.setText(cursor.getString(index));
+		    		finishOK();
 		    	}
         	});
+
+        	// Do not enable soft-keyboard automatically
+        	InputMethodManager inputManager = (InputMethodManager)this.getSystemService(Context.INPUT_METHOD_SERVICE); 
+        	inputManager.hideSoftInputFromWindow(mText.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS); 
 		};
-		protected abstract Cursor getCursor();
+		protected abstract void finishOK();
     }
     public static class FromActivity extends FromToActivity {
-		private Button _myLocationButton;
+		private Button mMyLocationButton;
 		@Override
 		protected void onCreate(Bundle savedInstanceState) {
     		setContentView(R.layout.from);
@@ -340,27 +281,24 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
 	        
 	        AutoCompleteStopAdapter stopAdapter = new AutoCompleteStopAdapter(this,
 	        		android.R.layout.simple_dropdown_item_1line, planner);
-	        _text.setAdapter(stopAdapter);
+	        mText.setAdapter(stopAdapter);
 	        
-	        _myLocationButton = (Button)findViewById(R.id.from_my_location);
-	        _myLocationButton.setOnClickListener(new View.OnClickListener() {
+	        mMyLocationButton = (Button)findViewById(R.id.from_my_location);
+	        mMyLocationButton.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					_text.setText(getAddressFromCurrentPosition(FromActivity.this));
-					finish();
+					mText.setText(getAddressFromCurrentPosition(FromActivity.this));
+					finishOK();
 				}
 			});
 		}
+
 		@Override
-		public void finish() {
+		protected void finishOK() {
 			Intent i = new Intent();
-			i.putExtra("com.markupartist.sthlmtraveling.startPoint", _text.getText());
+			i.putExtra("com.markupartist.sthlmtraveling.startPoint", mText.getText());
 			setResult(RESULT_OK, i);
 			super.finish();
-		}
-		@Override
-		protected Cursor getCursor() {
-			return mHistoryDbAdapter.fetchAllStartPoints();
 		}
     }
     public static class ToActivity extends FromToActivity {
@@ -372,18 +310,14 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
     		
 			AutoCompleteStopAdapter stopAdapter = new AutoCompleteStopAdapter(this, 
 			        android.R.layout.simple_dropdown_item_1line, planner);
-			_text.setAdapter(stopAdapter);
+			mText.setAdapter(stopAdapter);
 		}
 		@Override
-		public void finish() {
+		public void finishOK() {
 			Intent i = new Intent();
-			i.putExtra("com.markupartist.sthlmtraveling.endPoint", _text.getText());
+			i.putExtra("com.markupartist.sthlmtraveling.endPoint", mText.getText());
 			setResult(RESULT_OK, i);
 			super.finish();
-		}
-		@Override
-		protected Cursor getCursor() {
-			return mHistoryDbAdapter.fetchAllEndPoints();
 		}
     }
 }

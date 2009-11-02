@@ -3,18 +3,20 @@
     <string name="app_name">STHLM Traveling</string>
     <string name="from">From</string>
     <string name="to">To</string>
-    <string name="search">Search</string>
-    <string name="departing">Departing</string>
-    <string name="arriving">Arriving</string>
+    <string name="search">View results</string>
+    <string name="when_title">I want to...</string>
+    <string name="depart">Depart</string>
+    <string name="arrive">Arrive</string>
     <string name="no_routes">Unfortunately there was no route found. Please try entering another station/stop.</string>
     <string name="no_route_details">Unfortunately there was no route found. Most likely this search was too old.</string>
     <string name="new_search">Search</string>
     <string name="empty_value">Missing value</string>
     <string name="loading">Searching. Please wait...</string>
     <string name="from_my_location">From my location</string>
+    <string name="from_map">Pick from map</string>
     <string name="change_date_and_time">Change date &amp; time</string>
     <string name="about">About</string>
-    <string name="about_this_app">STHLM Traveling is developed by Johan Nilsson, please contact him if you have ideas or experience any problems.\n\nAll data is gathered from SL - Stockholm Public Transport.\n\nIcons by Fredrik Broman, http://fredrikbroman.com.</string>
+    <string name="about_title">About STHML Traveling</string>
     <string name="donate">Donate</string>
     <string name="feedback">Feedback</string>
     <string name="send_email">Send email...</string>
@@ -23,8 +25,10 @@
     <string name="when">When</string>
     <string name="pick_contact">Pick adress from contacts</string>
     <string name="go">Go</string>
+    <string name="set">Set</string>
     <string name="when_default">Now</string>
     <string name="recent_locations">Recent locations</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
+    <string name="or">or</string>
 </resources>

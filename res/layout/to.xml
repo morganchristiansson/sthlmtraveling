@@ -10,12 +10,9 @@
 		android:layout_width="fill_parent" android:layout_height="wrap_content">
 	    <AutoCompleteTextView android:id="@+id/text"
 			android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1"
-			android:hint="@string/to"
 			android:dropDownWidth="fill_parent"
 			android:singleLine="true"
-	        android:imeOptions="actionGo"/>
-        <Button android:id="@+id/go" android:text="@string/go"
-        	 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+	        android:imeOptions="actionDone"/>
 	</LinearLayout>
 
 	<Button android:text="@string/pick_contact" android:id="@+id/Button01" android:layout_width="fill_parent" android:layout_height="wrap_content" />

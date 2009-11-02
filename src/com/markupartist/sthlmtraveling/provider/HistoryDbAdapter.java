@@ -7,6 +7,7 @@ import java.util.Date;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -18,6 +19,7 @@ public class HistoryDbAdapter {
     public static final String KEY_NAME = "name";
     public static final String KEY_CREATED = "created";
 
+    public static final int TYPE_ALL_POINTS = -1;
     public static final int TYPE_START_POINT = 0;
     public static final int TYPE_END_POINT = 1;
 
@@ -137,18 +139,30 @@ public class HistoryDbAdapter {
         return fetchByType(TYPE_END_POINT);        
     }
 
-    public CharSequence fetchLastStartPoint() {
-    	Cursor cursor = fetchByType(TYPE_START_POINT, 1);
-    	cursor.moveToFirst();
-    	int index = cursor.getColumnIndex(KEY_NAME);
-		return cursor.getString(index);
+	public Cursor fetchAllPoints() {
+		return fetchByType(TYPE_ALL_POINTS);
+	}
+
+	public CharSequence fetchLastStartPoint() {
+    	try {
+	    	Cursor cursor = fetchByType(TYPE_START_POINT, 1);
+	    	cursor.moveToFirst();
+	    	int index = cursor.getColumnIndex(KEY_NAME);
+			return cursor.getString(index);
+		} catch(CursorIndexOutOfBoundsException e) {
+			return null;
+		}
 	}
 
 	public CharSequence fecthLastEndPoint() {
-    	Cursor cursor = fetchByType(TYPE_END_POINT, 1);
-    	cursor.moveToFirst();
-    	int index = cursor.getColumnIndex(KEY_NAME);
-		return cursor.getString(index);
+		try {
+	    	Cursor cursor = fetchByType(TYPE_END_POINT, 1);
+	    	cursor.moveToFirst();
+	    	int index = cursor.getColumnIndex(KEY_NAME);
+			return cursor.getString(index);
+		} catch(CursorIndexOutOfBoundsException e) {
+			return null;
+		}
 	}
 
     private Cursor fetchByType(int type) {
@@ -161,9 +175,10 @@ public class HistoryDbAdapter {
      * @return a Cursor object
      */
     private Cursor fetchByType(int type, int limit) {
+    	String where = type == TYPE_ALL_POINTS ? null : KEY_TYPE + "=" + type; 
         Cursor mCursor =
             mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,
-                    KEY_TYPE, KEY_NAME}, KEY_TYPE + "=" + type, null,
+                    KEY_TYPE, KEY_NAME}, where, null,
                     null, null, KEY_CREATED + " DESC", String.valueOf(limit));
         return mCursor;        
     }
