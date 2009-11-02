@@ -1,27 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
-  android:layout_width="fill_parent" android:layout_height="fill_parent">
-	<TextView android:text="@string/when_title" android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5px"></TextView><RadioGroup android:orientation="vertical"
-	  android:layout_width="fill_parent" android:layout_height="wrap_content">
- 
-	  <RadioButton android:id="@+id/depart" android:checked="true"
-	      android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/depart"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent" android:layout_height="fill_parent">
 
-	  <RadioButton android:id="@+id/arrive" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="@string/arrive"/>
-	
-</RadioGroup>
+    <TextView android:text="@string/when_title"
+              android:layout_width="wrap_content" android:layout_height="wrap_content"
+              android:layout_marginLeft="5px"/>
 
+    <RadioGroup android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <RadioButton android:id="@+id/depart" android:text="@string/depart"
+                     android:checked="true"
+                     android:layout_width="fill_parent" android:layout_height="wrap_content"/>
+        <RadioButton android:id="@+id/arrive" android:text="@string/arrive"
+                     android:layout_width="fill_parent" android:layout_height="wrap_content"/>
+    </RadioGroup>
 
-    <TextView android:id="@+id/TextView02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Date" android:layout_marginLeft="5px"></TextView><Spinner android:id="@+id/date"
-        android:layout_width="fill_parent" android:layout_height="wrap_content"
-        android:drawSelectorOnTop="true" android:layout_marginLeft="2px" android:layout_marginRight="2px"/>
+    <TextView android:id="@+id/date_label" android:text="@string/date_title"
+              android:layout_width="wrap_content" android:layout_height="wrap_content"
+              android:layout_marginLeft="5px"/>
+    <Spinner android:id="@+id/date"
+             android:layout_width="fill_parent" android:layout_height="wrap_content"
+             android:drawSelectorOnTop="true" android:layout_marginLeft="2px" android:layout_marginRight="2px"/>
 
-    
+    <TextView android:id="@+id/time_label" android:text="@string/time_title"
+              android:layout_width="wrap_content" android:layout_height="wrap_content"
+              android:layout_marginLeft="5px"/>
+    <TimePicker android:id="@+id/time"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
 
-    <TextView android:id="@+id/TextView03" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Time" android:layout_marginLeft="5px"></TextView><TimePicker android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:id="@+id/time"></TimePicker><Button android:id="@+id/go" android:layout_height="wrap_content" android:text="@string/set" android:layout_marginTop="50px" android:layout_gravity="center" android:layout_width="210px"/>
-
-
-
+    <LinearLayout
+                  android:layout_width="wrap_content" android:layout_height="fill_parent"
+                  android:layout_gravity="center_horizontal">
+        <Button android:id="@+id/go" android:text="@string/set"
+                style="@style/PrimaryAction"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_gravity="bottom"/>
+    </LinearLayout>
 </LinearLayout>

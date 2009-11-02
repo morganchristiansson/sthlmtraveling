@@ -14,14 +14,12 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -35,12 +33,10 @@ import com.markupartist.sthlmtraveling.provider.HistoryDbAdapter;
 
 public class PlannerActivity extends Activity implements OnSearchRoutesResultListener {
     private static final String TAG = "Search";
-    private static final int DIALOG_ABOUT = 2;
 	protected static final int ACTIVITY_FROM = 5;
 	protected static final int ACTIVITY_TO = 6;
 	protected static final int ACTIVITY_WHEN = 7;
 
-    private final Handler mHandler = new Handler();
 	private Button mFromButton;
 	private Button mToButton;
     private static HistoryDbAdapter mHistoryDbAdapter;
@@ -265,10 +261,11 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
 		    	}
         	});
 
-        	// Do not enable soft-keyboard automatically
-        	InputMethodManager inputManager = (InputMethodManager)this.getSystemService(Context.INPUT_METHOD_SERVICE); 
-        	inputManager.hideSoftInputFromWindow(mText.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS); 
-		};
+            Planner planner = Planner.getInstance();
+            AutoCompleteStopAdapter stopAdapter = new AutoCompleteStopAdapter(this, 
+                    R.layout.dropdown_list_row, planner);
+            mText.setAdapter(stopAdapter);
+		}
 		protected abstract void finishOK();
     }
     public static class FromActivity extends FromToActivity {
@@ -277,11 +274,6 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
 		protected void onCreate(Bundle savedInstanceState) {
     		setContentView(R.layout.from);
 			super.onCreate(savedInstanceState);
-	        Planner planner = Planner.getInstance();
-	        
-	        AutoCompleteStopAdapter stopAdapter = new AutoCompleteStopAdapter(this,
-	        		android.R.layout.simple_dropdown_item_1line, planner);
-	        mText.setAdapter(stopAdapter);
 	        
 	        mMyLocationButton = (Button)findViewById(R.id.from_my_location);
 	        mMyLocationButton.setOnClickListener(new View.OnClickListener() {
@@ -306,11 +298,6 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
 		protected void onCreate(Bundle savedInstanceState) {
     		setContentView(R.layout.to);
 			super.onCreate(savedInstanceState);
-			Planner planner = Planner.getInstance();
-    		
-			AutoCompleteStopAdapter stopAdapter = new AutoCompleteStopAdapter(this, 
-			        android.R.layout.simple_dropdown_item_1line, planner);
-			mText.setAdapter(stopAdapter);
 		}
 		@Override
 		public void finishOK() {

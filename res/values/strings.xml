@@ -15,6 +15,8 @@
     <string name="from_my_location">From my location</string>
     <string name="from_map">Pick from map</string>
     <string name="change_date_and_time">Change date &amp; time</string>
+    <string name="date_title">Date</string>
+    <string name="time_title">Time</string>
     <string name="about">About</string>
     <string name="about_title">About STHML Traveling</string>
     <string name="donate">Donate</string>
