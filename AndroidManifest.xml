@@ -15,8 +15,8 @@
         <activity android:name=".RouteDetailActivity"/>
         <activity android:name=".ChangeRouteTimeActivity"/>
         <activity android:name=".WhenActivity"/>
-        <activity android:name=".PlannerActivity$FromActivity"/>
-        <activity android:name=".PlannerActivity$ToActivity"/>
+        <activity android:name=".FromToActivity$FromActivity"/>
+        <activity android:name=".FromToActivity$ToActivity"/>
         <activity android:name=".AboutActivity" android:label="@string/about_title"/>
         <activity-alias android:name=".SearchActivity" android:targetActivity=".StartActivity">
             <intent-filter>
