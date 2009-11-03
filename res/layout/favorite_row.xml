@@ -16,49 +16,45 @@
 ** limitations under the License.
 */
 -->
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" 
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content"
     android:padding="5dip">
-    <LinearLayout
-        android:layout_width="fill_parent"
+    <ImageView android:id="@+id/startPointIcon" 
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
-        <ImageView 
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="4dip"
-            android:src="@drawable/bullet_white"
-            />
-        <TextView
-            android:id="@+id/favorite_start_point"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="?android:attr/textColorPrimary"
-            android:padding="2dip"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
-        <ImageView 
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="4dip"
-            android:src="@drawable/bullet_black"
-            />
-        <TextView
-            android:id="@+id/favorite_end_point"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="?android:attr/textColorPrimary"
-            android:padding="2dip"
-            />
-    </LinearLayout>
-</LinearLayout>
+        android:paddingTop="4dip"
+        android:src="@drawable/bullet_white"
+        />
+    <TextView
+        android:id="@+id/favorite_start_point"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/startPointIcon"
+        android:textColor="?android:attr/textColorPrimary"
+        android:padding="2dip"/>
 
+    <TextView
+        android:id="@+id/favorite_end_point"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_below="@+id/favorite_start_point"
+        android:layout_alignLeft="@+id/favorite_start_point"
+        android:textColor="?android:attr/textColorPrimary"
+        android:padding="2dip"
+        />
+
+    <ImageView android:id="@+id/endPointIcon" 
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_below="@+id/favorite_start_point"
+        android:layout_alignLeft="@+id/startPointIcon"
+        android:paddingTop="4dip"
+        android:src="@drawable/bullet_black"
+        />
+<!--
+  Adding this button removes the clickability of the row.
+  Also it looks too much like the native checkbox which is not good,
+  unless we make it toggle like the checkbox does.
+    <ImageButton android:id="@+id/reverse" android:src="@drawable/ic_button_reverse"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"/>
+ -->
+</RelativeLayout>
