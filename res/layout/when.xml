@@ -3,10 +3,10 @@
               android:orientation="vertical"
               android:layout_width="fill_parent" android:layout_height="fill_parent">
 
+<!-- 
     <TextView android:text="@string/when_title"
               android:layout_width="wrap_content" android:layout_height="wrap_content"
               android:layout_marginLeft="5px"/>
-
     <RadioGroup android:layout_width="fill_parent" android:layout_height="wrap_content">
         <RadioButton android:id="@+id/depart" android:text="@string/depart"
                      android:checked="true"
@@ -21,7 +21,7 @@
     <Spinner android:id="@+id/date"
              android:layout_width="fill_parent" android:layout_height="wrap_content"
              android:drawSelectorOnTop="true" android:layout_marginLeft="2px" android:layout_marginRight="2px"/>
-
+-->
     <TextView android:id="@+id/time_label" android:text="@string/time_title"
               android:layout_width="wrap_content" android:layout_height="wrap_content"
               android:layout_marginLeft="5px"/>
