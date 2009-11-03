@@ -41,7 +41,7 @@ public abstract class FromToActivity extends Activity {
         startManagingCursor(cursor);
         Log.d(TAG, "start/endPoints: " + cursor.getCount());
         mRecent = (ListView)findViewById(R.id.recent);
-        mRecent.setAdapter(new SimpleCursorAdapter(this, R.layout.dropdown_list_row,
+        mRecent.setAdapter(new SimpleCursorAdapter(this, R.layout.fromto_list_row,
             cursor, new String[]{HistoryDbAdapter.KEY_NAME}, new int[]{android.R.id.text1}));
         mRecent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -54,9 +54,10 @@ public abstract class FromToActivity extends Activity {
 
         Planner planner = Planner.getInstance();
         AutoCompleteStopAdapter stopAdapter = new AutoCompleteStopAdapter(this, 
-                R.layout.dropdown_list_row, planner);
+                R.layout.fromto_dropdown_row, planner);
         mText.setAdapter(stopAdapter);
     }
+
     protected abstract void finishOK();
     public static class FromActivity extends FromToActivity {
         private Button mMyLocationButton;
@@ -97,6 +98,7 @@ public abstract class FromToActivity extends Activity {
             super.finish();
         }
     }
+
     /**
      * Get address from the current position.
      * TODO: Extract to a class
@@ -159,5 +161,4 @@ public abstract class FromToActivity extends Activity {
         }
         return addressString;
     }
-
 }
