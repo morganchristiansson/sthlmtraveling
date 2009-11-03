@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.util.Log;
+import android.util.TimeFormatException;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -44,7 +45,9 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
     protected static final int ACTIVITY_WHEN = 7;
 
     private static final int NO_LOCATION = 5;
+    private static final String TIME_FORMAT = "%R";
 
+    private Time mTime;
     private Button mFromButton;
     private Button mToButton;
     private Button mSearchButton;
@@ -98,14 +101,12 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
                  error=true;
              }
              if(error) return;
-             Time time = new Time();
-             time.setToNow();
 
              SearchRoutesTask searchRoutesTask = 
                  new SearchRoutesTask(PlannerActivity.this)
                  .setOnSearchRoutesResultListener(PlannerActivity.this);
              searchRoutesTask.execute(mFromButton.getText().toString(), 
-                  mToButton.getText().toString(), time);
+                  mToButton.getText().toString(), mTime);
         }
     };
     private View.OnClickListener _whenListener = new View.OnClickListener() {
@@ -137,7 +138,9 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
             mToButton.setText(data.getCharSequenceExtra("com.markupartist.sthlmtraveling.endPoint"));
             break;
         case ACTIVITY_WHEN:
-            mWhenButton.setText(data.getCharSequenceExtra("com.markupartist.sthlmtraveling.routeTime"));
+            mTime = new Time();
+            mTime.parse(data.getStringExtra("com.markupartist.sthlmtraveling.routeTime"));
+            mWhenButton.setText(mTime.format(TIME_FORMAT));
             break;
         default:
             Log.w(TAG, "Unhandled activity resultCode: "+resultCode);

@@ -77,6 +77,10 @@ public class Planner {
 
     public ArrayList<Route> findRoutes(String startPoint, String endPoint, 
             Time time) {
+        if(time == null) {
+            time = new Time();
+            time.setToNow();
+        }
         Log.d(TAG, "Searching for startPoint=" + startPoint + ",endPoint=" + endPoint);
 
         String startPointEncoded = URLEncoder.encode(startPoint);
