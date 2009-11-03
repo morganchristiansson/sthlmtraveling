@@ -77,9 +77,7 @@ public class FavoritesActivity extends ListActivity {
         time.setToNow();
 
         //searchRoutes(startPoint, endPoint, time);
-        OnSearchResult onSearchResult = new OnSearchResult();
-        onSearchResult.startPoint = startPoint;
-        onSearchResult.endPoint = endPoint;
+        OnSearchResult onSearchResult = new OnSearchResult(startPoint, endPoint);
         new SearchRoutesTask(this)
             .setOnSearchRoutesResultListener(onSearchResult)
             .execute(startPoint, endPoint, time);
@@ -92,14 +90,20 @@ public class FavoritesActivity extends ListActivity {
     }
 
     private class OnSearchResult implements OnSearchRoutesResultListener {
-        String startPoint;
-        String endPoint;
+        private String mStartPoint;
+        private String mEndPoint;
+
+        public OnSearchResult(String startPoint, String endPoint) {
+            super();
+            mStartPoint = startPoint;
+            mEndPoint = endPoint;
+        }
 
         @Override
         public void onSearchRoutesResult(ArrayList<Route> routes) {
             Intent i = new Intent(FavoritesActivity.this, RoutesActivity.class);
-            i.putExtra("com.markupartist.sthlmtraveling.startPoint", startPoint);
-            i.putExtra("com.markupartist.sthlmtraveling.endPoint", endPoint);
+            i.putExtra("com.markupartist.sthlmtraveling.startPoint", mStartPoint);
+            i.putExtra("com.markupartist.sthlmtraveling.endPoint", mEndPoint);
             startActivity(i);
         }
     }
