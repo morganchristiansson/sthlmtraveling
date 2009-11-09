@@ -73,7 +73,7 @@ public class SearchRoutesTask extends AsyncTask<Object, Void, ArrayList<Route>>{
     private void onNoRoutesFound() {
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
         builder.setTitle("Unfortunately no routes was found")
-            .setMessage("If searhing for an address try adding a house number.")
+            .setMessage("If searching for an address try adding a house number.")
             .setCancelable(true)
             .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
