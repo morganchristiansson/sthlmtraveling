@@ -63,7 +63,7 @@ public class RouteDetailActivity extends ListActivity {
 
         setListAdapter(mDetailAdapter);
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -87,5 +87,4 @@ public class RouteDetailActivity extends ListActivity {
         super.onDestroy();
         mFavoritesDbAdapter.close();
     }
-
 }

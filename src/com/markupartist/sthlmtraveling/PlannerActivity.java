@@ -32,46 +32,45 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.markupartist.sthlmtraveling.FromToActivity.FromActivity;
 import com.markupartist.sthlmtraveling.FromToActivity.ToActivity;
 import com.markupartist.sthlmtraveling.SearchRoutesTask.OnSearchRoutesResultListener;
 import com.markupartist.sthlmtraveling.provider.HistoryDbAdapter;
 
-public class PlannerActivity extends Activity implements OnSearchRoutesResultListener {
+public class PlannerActivity extends Activity {
     private static final String TAG = "Planner";
     protected static final int ACTIVITY_FROM = 5;
     protected static final int ACTIVITY_TO = 6;
-    protected static final int ACTIVITY_WHEN = 7;
 
     private static final int NO_LOCATION = 5;
     private static final String TIME_FORMAT = "%R";
 
-    private Time mTime;
-    private Button mFromButton;
+	private Button mFromButton;
     private Button mToButton;
-    private Button mSearchButton;
-    private Button mWhenButton;
+    private Button mSearchNowButton;
+    private Button mSearchLaterButton;
     private ImageButton mReverseButton;
-    static HistoryDbAdapter mHistoryDbAdapter;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.planner);
 
-        mWhenButton = (Button)findViewById(R.id.when);
-        mWhenButton.setOnClickListener(_whenListener);
-        mHistoryDbAdapter = new HistoryDbAdapter(this).open();
-
-        mSearchButton = (Button) findViewById(R.id.search_route);
-        mSearchButton.setOnClickListener(_searchListener);
         mFromButton = (Button)findViewById(R.id.from);
         mFromButton.setOnClickListener(_fromListener);
-        mFromButton.setText(mHistoryDbAdapter.fetchLastStartPoint());
         mToButton = (Button)findViewById(R.id.to);
         mToButton.setOnClickListener(_toListener);
-        mToButton.setText(mHistoryDbAdapter.fecthLastEndPoint());
-       
+
+        HistoryDbAdapter historyDbAdapter = new HistoryDbAdapter(this).open();
+        mFromButton.setText(historyDbAdapter.fetchLastStartPoint());
+        mToButton.setText(historyDbAdapter.fecthLastEndPoint());
+
+        mSearchNowButton = (Button) findViewById(R.id.search_now);
+        mSearchNowButton.setOnClickListener(_searchNowListener);
+        mSearchLaterButton = (Button)findViewById(R.id.search_later);
+        mSearchLaterButton.setOnClickListener(_searchLaterListener);
+
         mReverseButton = (ImageButton)findViewById(R.id.reverse);
         mReverseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,32 +86,37 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
         mFromButton.setText(endPoint);
         mToButton.setText(startPoint);
     }
-    
-    View.OnClickListener _searchListener = new View.OnClickListener() {
+    private boolean validate() {
+        boolean error = false;
+        if (mFromButton.getText().length() <= 0) {
+            mFromButton.setError(getText(R.string.empty_value));
+            error=true;
+        }
+        if (mToButton.getText().length() <= 0) {
+            mToButton.setError(getText(R.string.empty_value));
+            error=true;
+        }
+        return !error;
+    }
+
+    View.OnClickListener _searchNowListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-             boolean error = false;
-             if (mFromButton.getText().length() <= 0) {
-                 mFromButton.setError(getText(R.string.empty_value));
-                 error=true;
-             }
-             if (mToButton.getText().length() <= 0) {
-                 mToButton.setError(getText(R.string.empty_value));
-                 error=true;
-             }
-             if(error) return;
-
-             SearchRoutesTask searchRoutesTask = 
-                 new SearchRoutesTask(PlannerActivity.this)
-                 .setOnSearchRoutesResultListener(PlannerActivity.this);
-             searchRoutesTask.execute(mFromButton.getText().toString(), 
-                  mToButton.getText().toString(), mTime);
+            if(!validate()) return;
+            Intent i = new Intent(PlannerActivity.this, RoutesActivity.class);
+            i.putExtra("com.markupartist.sthlmtraveling.startPoint", mFromButton.getText().toString());
+            i.putExtra("com.markupartist.sthlmtraveling.endPoint", mToButton.getText().toString());
+            startActivity(i);
         }
     };
-    private View.OnClickListener _whenListener = new View.OnClickListener() {
+    private View.OnClickListener _searchLaterListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            startActivityForResult(new Intent(PlannerActivity.this, WhenActivity.class), ACTIVITY_WHEN);
+            if(!validate()) return;
+            Intent i = new Intent(PlannerActivity.this, WhenActivity.class);
+            i.putExtra("com.markupartist.sthlmtraveling.startPoint", mFromButton.getText().toString());
+            i.putExtra("com.markupartist.sthlmtraveling.endPoint", mToButton.getText().toString());
+            startActivity(i);
         }
     };
     View.OnClickListener _fromListener = new View.OnClickListener() {
@@ -136,11 +140,6 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
             break;
         case ACTIVITY_TO:
             mToButton.setText(data.getCharSequenceExtra("com.markupartist.sthlmtraveling.endPoint"));
-            break;
-        case ACTIVITY_WHEN:
-            mTime = new Time();
-            mTime.parse(data.getStringExtra("com.markupartist.sthlmtraveling.routeTime"));
-            mWhenButton.setText(mTime.format(TIME_FORMAT));
             break;
         default:
             Log.w(TAG, "Unhandled activity resultCode: "+resultCode);
@@ -171,7 +170,6 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mHistoryDbAdapter.close();
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -184,17 +182,17 @@ public class PlannerActivity extends Activity implements OnSearchRoutesResultLis
         }
     }
  
-    @Override
-    public void onSearchRoutesResult(ArrayList<Route> routes) {
-        String startPoint = mFromButton.getText().toString();
-        String endPoint = mToButton.getText().toString();
-
-        mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_START_POINT, startPoint);
-        mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_END_POINT, endPoint);
-
-        Intent i = new Intent(this, RoutesActivity.class);
-        i.putExtra("com.markupartist.sthlmtraveling.startPoint", startPoint);
-        i.putExtra("com.markupartist.sthlmtraveling.endPoint", endPoint);
-        startActivity(i);
-    }
+//    @Override
+//    public void onSearchRoutesResult(ArrayList<Route> routes) {
+//        String startPoint = mFromButton.getText().toString();
+//        String endPoint = mToButton.getText().toString();
+//
+//        mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_START_POINT, startPoint);
+//        mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_END_POINT, endPoint);
+//
+//        Intent i = new Intent(this, RoutesActivity.class);
+//        i.putExtra("com.markupartist.sthlmtraveling.startPoint", startPoint);
+//        i.putExtra("com.markupartist.sthlmtraveling.endPoint", endPoint);
+//        startActivity(i);
+//    }
 }

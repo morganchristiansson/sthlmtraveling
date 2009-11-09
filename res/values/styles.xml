@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="PrimaryAction">
-        <item name="android:width">210dip</item>
         <item name="android:height">72dip</item>
         <item name="android:textStyle">bold</item>
+    </style>
+    <style name="SecondaryAction">
+        <item name="android:height">72dip</item>
     </style>
 </resources>

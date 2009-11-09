@@ -14,6 +14,7 @@
         <RadioButton android:id="@+id/arrive" android:text="@string/arrive"
                      android:layout_width="fill_parent" android:layout_height="wrap_content"/>
     </RadioGroup>
+-->
 
     <TextView android:id="@+id/date_label" android:text="@string/date_title"
               android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -21,7 +22,7 @@
     <Spinner android:id="@+id/date"
              android:layout_width="fill_parent" android:layout_height="wrap_content"
              android:drawSelectorOnTop="true" android:layout_marginLeft="2px" android:layout_marginRight="2px"/>
--->
+
     <TextView android:id="@+id/time_label" android:text="@string/time_title"
               android:layout_width="wrap_content" android:layout_height="wrap_content"
               android:layout_marginLeft="5px"/>

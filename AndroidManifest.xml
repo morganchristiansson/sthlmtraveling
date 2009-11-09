@@ -24,6 +24,7 @@
         <activity android:name=".PlannerActivity"/>
         <activity android:name=".FavoritesActivity"/>
         <activity android:name=".WhenActivity"/>
+        <activity android:name=".WhenActivity$WithResult"/>
         <activity android:name=".FromToActivity$FromActivity"/>
         <activity android:name=".FromToActivity$ToActivity"/>
         <activity android:name=".RoutesActivity"/>

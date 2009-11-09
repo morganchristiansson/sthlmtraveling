@@ -24,16 +24,6 @@
             android:layout_below="@+id/to_label"
             android:layout_marginLeft="2dip" android:layout_marginRight="2dip"/>
 
-    <TextView android:id="@+id/when_label" android:text="@string/when"
-              android:layout_below="@+id/to"
-              android:layout_width="wrap_content" android:layout_height="wrap_content" 
-              android:layout_marginLeft="6dip" />
-
-    <Button android:id="@+id/when" android:text="@string/when_default"
-            android:layout_width="fill_parent" android:layout_height="wrap_content"
-            android:layout_below="@+id/when_label"
-            android:layout_marginLeft="2dip" android:layout_marginRight="2dip"/>
-
     <!-- 
       If the screen is not tall enough the button will render on top of the other components.
       If the <RelativeLayout/> is wrapped in a <ScrollView/> then
@@ -41,9 +31,19 @@
       As a workaround I have set android:screenOrientation="portrait" in AndroidManifest.xml.
       / Morgan @ 2009-11-03
       -->
-    <Button android:id="@+id/search_route" android:text="@string/search"
-            style="@style/PrimaryAction"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"/>
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:layout_alignParentBottom="true">
+        <Button android:id="@+id/search_now" android:text="@string/search_now"
+                style="@style/PrimaryAction"
+                android:layout_width="fill_parent" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="2dip"/>
+    
+        <Button android:id="@+id/search_later" android:text="@string/search_later"
+                style="@style/SecondaryAction"
+                android:layout_width="fill_parent" android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginRight="2dip"/>
+    </LinearLayout>
 </RelativeLayout>

@@ -70,7 +70,7 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
     private TextView mFromView;
     private TextView mToView;
     private ArrayList<HashMap<String, String>> mDateAdapterData;
-    private Time mTime;
+    private Time mTime = new Time();
     private FavoritesDbAdapter mFavoritesDbAdapter;
     private FavoriteButtonHelper mFavoriteButtonHelper;
 
@@ -93,13 +93,14 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
         Bundle extras = getIntent().getExtras();
         mFromView.setText(extras.getString("com.markupartist.sthlmtraveling.startPoint"));
         mToView.setText(extras.getString("com.markupartist.sthlmtraveling.endPoint"));
+        setTime(extras);
 
         mFavoriteButtonHelper = new FavoriteButtonHelper(
                 this, mFavoritesDbAdapter, 
                 mFromView.getText().toString(), mToView.getText().toString());
         mFavoriteButtonHelper.loadImage();
 
-        createSections();
+        searchRoutes();
     }
 
     @Override
@@ -112,8 +113,6 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
         // Date and time adapter.
 
         // For now just get the current date time.
-        mTime = new Time();
-        mTime.setToNow();
         String timeString = mTime.format("%R %x"); // %r
         mDateAdapterData = new ArrayList<HashMap<String,String>>(1); 
         HashMap<String, String> item = new HashMap<String, String>();
@@ -256,7 +255,7 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
             }
             break;
         case SECTION_CHANGE_TIME:
-            Intent i = new Intent(this, WhenActivity.class);
+            Intent i = new Intent(this, WhenActivity.WithResult.class);
 
             i.putExtra("com.markupartist.sthlmtraveling.routeTime", mTime.format2445());
             //i.putExtra("com.markupartist.sthlmtraveling.startPoint", mFromView.getText());
@@ -322,12 +321,28 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
                 Log.d(TAG, "Change time activity cancelled.");
                 return;
             }
-            String newTime = data.getStringExtra("com.markupartist.sthlmtraveling.routeTime");
-            mTime.parse(newTime);
-            searchRoutes(mFromView.getText(), mToView.getText(), mTime);
+            setTime(data.getExtras());
+            searchRoutes();
         }
     }
-    
+
+    private void setTime(Bundle extras) {
+    	String time = extras.getString("com.markupartist.sthlmtraveling.routeTime");
+    	if(time != null) {
+    		mTime.parse(time);
+    	} else {
+    		mTime = new Time();
+    		mTime.setToNow();
+    	}
+    }
+
+    /**
+     * Fires off a thread to do the query. Will call onSearchResult when done.
+     */
+    private void searchRoutes() {
+        searchRoutes(mFromView.getText(), mToView.getText(), mTime);
+    }
+
     /**
      * Fires off a thread to do the query. Will call onSearchResult when done.
      * @param startPoint the start point.
@@ -346,6 +361,7 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
      */
     @Override
     public void onSearchRoutesResult(ArrayList<Route> routes) {
+        createSections();
         //final ArrayList<Route> routes = Planner.getInstance().lastFoundRoutes();
         mRouteAdapter.refill(routes);
 

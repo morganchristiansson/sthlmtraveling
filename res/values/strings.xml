@@ -21,8 +21,6 @@
     <string name="app_name">STHLM Traveling</string>
     <string name="from">From</string>
     <string name="to">To</string>
-    <string name="search">View results</string>
-    <string name="when_title">I want to...</string>
     <string name="depart">Depart</string>
     <string name="arrive">Arrive</string>
     <string name="no_routes">Unfortunately there was no route found. Please try entering another station/stop.</string>
@@ -41,11 +39,9 @@
     <string name="feedback">Feedback</string>
     <string name="send_email">Send email...</string>
     <string name="favorites_label">Favorites</string>
-    <string name="when">When</string>
     <string name="pick_contact">Pick adress from contacts</string>
     <string name="go">Go</string>
     <string name="set">Set</string>
-    <string name="when_default">Now</string>
     <string name="recent_locations">Recent locations</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
@@ -54,4 +50,6 @@
     <string name="no_location_title">Location Problem</string>
     <string name="no_location_message">Failed to determine your location.</string>
     <string name="search_label">Search</string>
- </resources>
+    <string name="search_now">Now</string>
+    <string name="search_later">Later</string>
+</resources>

@@ -37,7 +37,9 @@ public abstract class FromToActivity extends Activity {
             }
         });
 
-        final Cursor cursor = PlannerActivity.mHistoryDbAdapter.fetchAllPoints();
+        HistoryDbAdapter mHistoryDbAdapter = new HistoryDbAdapter(this).open();
+        final Cursor cursor = mHistoryDbAdapter.fetchAllPoints();
+        mHistoryDbAdapter.close();
         startManagingCursor(cursor);
         Log.d(TAG, "start/endPoints: " + cursor.getCount());
         mRecent = (ListView)findViewById(R.id.recent);
