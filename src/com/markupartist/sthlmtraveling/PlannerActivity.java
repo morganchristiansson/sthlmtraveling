@@ -161,13 +161,6 @@ public class PlannerActivity extends Activity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu_search, menu);
-        return true;
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
     }
