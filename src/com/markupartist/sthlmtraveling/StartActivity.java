@@ -29,14 +29,14 @@ public class StartActivity extends TabActivity {
         final TabHost tabHost = getTabHost();
 
         tabHost.addTab(tabHost.newTabSpec("search")
-                .setIndicator(getText(R.string.search_label), getResources().getDrawable(R.drawable.ic_tab_search))
+                .setIndicator(getText(R.string.search), getResources().getDrawable(R.drawable.ic_tab_search))
                 .setContent(new Intent(this, PlannerActivity.class)
                 // Setting this to clear solves a java.lang.StackOverflowError
                 // issues that is triggered sometimes...
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
 
         tabHost.addTab(tabHost.newTabSpec("favorites")
-                .setIndicator(getText(R.string.favorites_label), getResources().getDrawable(R.drawable.ic_tab_favorites))
+                .setIndicator(getText(R.string.favorites), getResources().getDrawable(R.drawable.ic_tab_favorites))
                 .setContent(new Intent(this, FavoritesActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
 
