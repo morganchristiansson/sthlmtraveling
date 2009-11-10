@@ -67,13 +67,14 @@ public class WhenActivity extends Activity {
 		dates[1] = Html.fromHtml("<b>"+getText(R.string.tomorrow)+"</b> " +
 		                         weekdayFormat.format(cal.getTime()));
 		cal.add(Calendar.DAY_OF_MONTH, 1);
-		
+
 		for(int i=2; i<30; i++) {
 			dates[i] = Html.fromHtml(FORMAT.format(cal.getTime()));
 			cal.add(Calendar.DAY_OF_MONTH, 1);
 		}
 		return dates;
 	}
+
     public static class WithResult extends WhenActivity {
     	@Override
         protected void myfinish(Intent i) {
