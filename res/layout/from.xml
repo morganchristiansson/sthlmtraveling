@@ -9,27 +9,27 @@
         android:layout_width="wrap_content" android:layout_height="wrap_content"
     />
 
-    <LinearLayout
-        android:layout_width="fill_parent" android:layout_height="wrap_content">
-        <AutoCompleteTextView android:id="@+id/text" android:hint="@string/from"
-            android:layout_width="fill_parent" android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableRight="@drawable/ic_button_search"
-            android:nextFocusUp="@+id/text" android:nextFocusLeft="@+id/text"
-            android:dropDownWidth="fill_parent"
-            android:imeOptions="actionDone"/>
-    </LinearLayout>
+    <AutoCompleteTextView android:id="@+id/text" android:hint="@string/from"
+        android:layout_width="fill_parent" android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:drawableRight="@drawable/ic_button_search"
+        android:nextFocusUp="@+id/text" android:nextFocusLeft="@+id/text"
+        android:dropDownWidth="fill_parent"
+        android:imeOptions="actionDone"/>
 
     <LinearLayout
         android:layout_width="wrap_content" android:layout_height="wrap_content">
         <Button android:id="@+id/from_my_location" android:text="@string/from_my_location"
                 android:drawableRight="@drawable/ic_button_mylocation"
                 android:layout_width="fill_parent" android:layout_height="wrap_content" />
+<!-- TODO: implement Pick location from map
         <TextView android:text="@string/or"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         <Button android:id="@+id/from_map" android:text="@string/from_map"
             android:drawableRight="@drawable/ic_button_pick"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+-->
+
     </LinearLayout>
     <TextView android:text="@string/recent_locations"
               android:layout_width="wrap_content" android:layout_height="wrap_content"/>
