@@ -22,7 +22,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -155,16 +154,6 @@ public class PlannerActivity extends Activity {
                 .create();
         }
         return dialog;
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.about:
-            startActivity(new Intent(this, AboutActivity.class));
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
