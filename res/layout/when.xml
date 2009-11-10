@@ -31,11 +31,11 @@
                 android:layout_gravity="center"/>
 
     <LinearLayout
-                  android:layout_width="wrap_content" android:layout_height="fill_parent"
+                  android:layout_width="fill_parent" android:layout_height="fill_parent"
                   android:layout_gravity="center_horizontal">
-        <Button android:id="@+id/go" android:text="@string/set"
+        <Button android:id="@+id/go" android:text="@string/search"
                 style="@style/PrimaryAction"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_width="fill_parent" android:layout_height="wrap_content"
                 android:layout_gravity="bottom"/>
     </LinearLayout>
 </LinearLayout>
