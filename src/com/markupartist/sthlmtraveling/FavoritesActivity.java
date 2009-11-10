@@ -16,8 +16,6 @@
 
 package com.markupartist.sthlmtraveling;
 
-import java.util.ArrayList;
-
 import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -27,7 +25,6 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-import com.markupartist.sthlmtraveling.SearchRoutesTask.OnSearchRoutesResultListener;
 import com.markupartist.sthlmtraveling.provider.FavoritesDbAdapter;
 
 public class FavoritesActivity extends ListActivity {
@@ -68,6 +65,7 @@ public class FavoritesActivity extends ListActivity {
 
         Cursor favoritesCursor = ((SimpleCursorAdapter) this.getListAdapter()).getCursor();
 
+        // TODO: Cache getColumnIndex for the future.
         String startPoint = favoritesCursor.getString(
                 favoritesCursor.getColumnIndex(FavoritesDbAdapter.KEY_START_POINT));
         String endPoint = favoritesCursor.getString(
@@ -76,35 +74,16 @@ public class FavoritesActivity extends ListActivity {
         Time time = new Time();
         time.setToNow();
 
-        //searchRoutes(startPoint, endPoint, time);
-        OnSearchResult onSearchResult = new OnSearchResult(startPoint, endPoint);
-        new SearchRoutesTask(this)
-            .setOnSearchRoutesResultListener(onSearchResult)
-            .execute(startPoint, endPoint, time);
+        Intent i = new Intent(FavoritesActivity.this, RoutesActivity.class);
+        i.putExtra("com.markupartist.sthlmtraveling.routeTime", time.format2445());
+        i.putExtra("com.markupartist.sthlmtraveling.startPoint", startPoint);
+        i.putExtra("com.markupartist.sthlmtraveling.endPoint", endPoint);
+        startActivity(i);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mFavoritesDbAdapter.close();
-    }
-
-    private class OnSearchResult implements OnSearchRoutesResultListener {
-        private String mStartPoint;
-        private String mEndPoint;
-
-        public OnSearchResult(String startPoint, String endPoint) {
-            super();
-            mStartPoint = startPoint;
-            mEndPoint = endPoint;
-        }
-
-        @Override
-        public void onSearchRoutesResult(ArrayList<Route> routes) {
-            Intent i = new Intent(FavoritesActivity.this, RoutesActivity.class);
-            i.putExtra("com.markupartist.sthlmtraveling.startPoint", mStartPoint);
-            i.putExtra("com.markupartist.sthlmtraveling.endPoint", mEndPoint);
-            startActivity(i);
-        }
     }
 }

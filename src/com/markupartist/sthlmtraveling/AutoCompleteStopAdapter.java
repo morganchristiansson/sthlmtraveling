@@ -16,14 +16,19 @@
 
 package com.markupartist.sthlmtraveling;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.markupartist.sthlmtraveling.planner.Planner;
+
+import android.app.AlertDialog;
 import android.content.Context;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.Toast;
 
 public class AutoCompleteStopAdapter extends ArrayAdapter<String> implements Filterable {
     private static String TAG = "AutoCompleteStopAdapter";
@@ -37,20 +42,25 @@ public class AutoCompleteStopAdapter extends ArrayAdapter<String> implements Fil
     @Override
     public Filter getFilter() {
         Filter nameFilter = new Filter() {
+            private boolean mWasSuccess = true; // We are optimistic ones...
+
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
-                if (constraint != null) {
-                    Log.d(TAG, "Searching for " + constraint);
-                    ArrayList<String> list = 
-                        mPlanner.findStop(constraint.toString());
+                FilterResults filterResults = new FilterResults();
 
-                    FilterResults filterResults = new FilterResults();
-                    filterResults.values = list;
-                    filterResults.count = list.size();
-                    return filterResults;
-                } else {
-                    return new FilterResults();
+                if (constraint != null) {
+                    //Log.d(TAG, "Searching for " + constraint);
+                    ArrayList<String> list;
+                    try {
+                        list = mPlanner.findStop(constraint.toString());
+                        filterResults.values = list;
+                        filterResults.count = list.size();
+                    } catch (IOException e) {
+                        mWasSuccess = false;
+                    }
                 }
+
+                return filterResults;
             }
 
             @Override
@@ -61,6 +71,10 @@ public class AutoCompleteStopAdapter extends ArrayAdapter<String> implements Fil
                         add(value);
                     }
                     notifyDataSetChanged();
+                } else if (!mWasSuccess) {
+                    Toast.makeText(getContext(), 
+                            getContext().getResources().getText(R.string.network_problem_message), 
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         };

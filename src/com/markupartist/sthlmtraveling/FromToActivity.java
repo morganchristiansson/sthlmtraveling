@@ -20,12 +20,15 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+
+import com.markupartist.sthlmtraveling.planner.Planner;
 import com.markupartist.sthlmtraveling.provider.HistoryDbAdapter;
 
 public abstract class FromToActivity extends Activity {
     private static final String TAG = "FromTo";
     protected AutoCompleteTextView mText;
     protected ListView mRecent;
+	private HistoryDbAdapter mHistoryDbAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,9 +40,8 @@ public abstract class FromToActivity extends Activity {
             }
         });
 
-        HistoryDbAdapter mHistoryDbAdapter = new HistoryDbAdapter(this).open();
+        mHistoryDbAdapter = new HistoryDbAdapter(this).open();
         final Cursor cursor = mHistoryDbAdapter.fetchAllPoints();
-        mHistoryDbAdapter.close();
         startManagingCursor(cursor);
         Log.d(TAG, "start/endPoints: " + cursor.getCount());
         mRecent = (ListView)findViewById(R.id.recent);
@@ -60,7 +62,13 @@ public abstract class FromToActivity extends Activity {
         mText.setAdapter(stopAdapter);
     }
 
-    protected abstract void finishOK();
+    @Override
+	protected void onDestroy() {
+		super.onDestroy();
+        mHistoryDbAdapter.close();
+	}
+
+	protected abstract void finishOK();
     public static class FromActivity extends FromToActivity {
         private Button mMyLocationButton;
         @Override

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.markupartist.sthlmtraveling;
+package com.markupartist.sthlmtraveling.planner;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -50,8 +50,6 @@ public class RouteDetailParser extends DefaultHandler {
             input.setEncoding("UTF-8");
             xr.parse(input);
             // TODO: Not ok to kill all exceptions like this!!!
-        } catch (MalformedURLException e) {
-            Log.e(TAG, e.toString());
         } catch (IOException e) {
             Log.e(TAG, e.toString());
         } catch (SAXException e) {

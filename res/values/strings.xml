@@ -51,4 +51,6 @@
     <string name="new_search">Search</string>
     <string name="search_now">Now</string>
     <string name="search_later">Later</string>
+    <string name="network_problem_label">Network problem</string>
+    <string name="network_problem_message">A network problem occurred</string>
 </resources>

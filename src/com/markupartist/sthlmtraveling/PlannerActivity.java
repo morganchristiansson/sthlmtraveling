@@ -16,27 +16,19 @@
 
 package com.markupartist.sthlmtraveling;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.format.Time;
 import android.util.Log;
-import android.util.TimeFormatException;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.markupartist.sthlmtraveling.FromToActivity.FromActivity;
 import com.markupartist.sthlmtraveling.FromToActivity.ToActivity;
-import com.markupartist.sthlmtraveling.SearchRoutesTask.OnSearchRoutesResultListener;
 import com.markupartist.sthlmtraveling.provider.HistoryDbAdapter;
 
 public class PlannerActivity extends Activity {
@@ -45,13 +37,12 @@ public class PlannerActivity extends Activity {
     protected static final int ACTIVITY_TO = 6;
 
     private static final int NO_LOCATION = 5;
-    private static final String TIME_FORMAT = "%R";
-
-	private Button mFromButton;
+    private Button mFromButton;
     private Button mToButton;
     private Button mSearchNowButton;
     private Button mSearchLaterButton;
     private ImageButton mReverseButton;
+	private HistoryDbAdapter mHistoryDbAdapter;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,9 +53,9 @@ public class PlannerActivity extends Activity {
         mToButton = (Button)findViewById(R.id.to);
         mToButton.setOnClickListener(_toListener);
 
-        HistoryDbAdapter historyDbAdapter = new HistoryDbAdapter(this).open();
-        mFromButton.setText(historyDbAdapter.fetchLastStartPoint());
-        mToButton.setText(historyDbAdapter.fecthLastEndPoint());
+        mHistoryDbAdapter = new HistoryDbAdapter(this).open();
+        mFromButton.setText(mHistoryDbAdapter.fetchLastStartPoint());
+        mToButton.setText(mHistoryDbAdapter.fecthLastEndPoint());
 
         mSearchNowButton = (Button) findViewById(R.id.search_now);
         mSearchNowButton.setOnClickListener(_searchNowListener);
@@ -103,9 +94,15 @@ public class PlannerActivity extends Activity {
         @Override
         public void onClick(View v) {
             if(!validate()) return;
-            Intent i = new Intent(PlannerActivity.this, RoutesActivity.class);
-            i.putExtra("com.markupartist.sthlmtraveling.startPoint", mFromButton.getText().toString());
-            i.putExtra("com.markupartist.sthlmtraveling.endPoint", mToButton.getText().toString());
+			String startPoint = mFromButton.getText().toString();
+			String endPoint = mToButton.getText().toString();
+			
+			mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_START_POINT, startPoint);
+			mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_END_POINT, endPoint);
+
+			Intent i = new Intent(PlannerActivity.this, RoutesActivity.class);
+            i.putExtra("com.markupartist.sthlmtraveling.startPoint", startPoint);
+            i.putExtra("com.markupartist.sthlmtraveling.endPoint", endPoint);
             startActivity(i);
         }
     };
@@ -160,11 +157,6 @@ public class PlannerActivity extends Activity {
         return dialog;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.about:
@@ -174,18 +166,10 @@ public class PlannerActivity extends Activity {
             return super.onOptionsItemSelected(item);
         }
     }
- 
-//    @Override
-//    public void onSearchRoutesResult(ArrayList<Route> routes) {
-//        String startPoint = mFromButton.getText().toString();
-//        String endPoint = mToButton.getText().toString();
-//
-//        mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_START_POINT, startPoint);
-//        mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_END_POINT, endPoint);
-//
-//        Intent i = new Intent(this, RoutesActivity.class);
-//        i.putExtra("com.markupartist.sthlmtraveling.startPoint", startPoint);
-//        i.putExtra("com.markupartist.sthlmtraveling.endPoint", endPoint);
-//        startActivity(i);
-//    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mHistoryDbAdapter.close();
+    }
 }
