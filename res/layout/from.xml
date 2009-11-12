@@ -6,12 +6,11 @@
     <!-- Empty dummy to prevent AutoCompleteTextView from receiving focus -->
     <LinearLayout
         android:focusable="true" android:focusableInTouchMode="true"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_width="0px" android:layout_height="0px"
     />
 
     <AutoCompleteTextView android:id="@+id/text" android:hint="@string/from"
-        android:layout_width="fill_parent" android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_width="fill_parent" android:layout_height="fill_parent"
         android:drawableRight="@drawable/ic_button_search"
         android:nextFocusUp="@+id/text" android:nextFocusLeft="@+id/text"
         android:dropDownWidth="fill_parent"
