@@ -16,6 +16,8 @@
 
 package com.markupartist.sthlmtraveling;
 
+import com.markupartist.sthlmtraveling.util.Tracker;
+
 import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -41,8 +43,14 @@ public class StartActivity extends TabActivity {
         tabHost.addTab(tabHost.newTabSpec("favorites")
                 .setIndicator(getText(R.string.favorites), getResources().getDrawable(R.drawable.ic_tab_favorites))
                 .setContent(new Intent(this, FavoritesActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+        Tracker.start(this);
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Tracker.stop();
     }
 
     @Override

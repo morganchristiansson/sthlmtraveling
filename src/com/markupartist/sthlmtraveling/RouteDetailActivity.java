@@ -31,6 +31,7 @@ import com.markupartist.sthlmtraveling.planner.Route;
 import com.markupartist.sthlmtraveling.provider.FavoritesDbAdapter;
 import com.markupartist.sthlmtraveling.tasks.FindRouteDetailsTask;
 import com.markupartist.sthlmtraveling.tasks.FindRouteDetailsTask.OnRouteDetailsResultListener;
+import com.markupartist.sthlmtraveling.util.Tracker;
 
 public class RouteDetailActivity extends ListActivity implements OnRouteDetailsResultListener {
     private ArrayAdapter<String> mDetailAdapter;
@@ -67,6 +68,7 @@ public class RouteDetailActivity extends ListActivity implements OnRouteDetailsR
         FindRouteDetailsTask findRouteDetailsTask = new FindRouteDetailsTask(this);
         findRouteDetailsTask.setOnRouteDetailsResultListener(this);
         findRouteDetailsTask.execute(route);
+        Tracker.trackPageView("RouteDetail");
     }
 
     @Override

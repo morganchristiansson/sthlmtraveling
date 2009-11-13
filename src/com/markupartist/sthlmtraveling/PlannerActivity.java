@@ -29,6 +29,7 @@ import android.widget.ImageButton;
 import com.markupartist.sthlmtraveling.FromToActivity.FromActivity;
 import com.markupartist.sthlmtraveling.FromToActivity.ToActivity;
 import com.markupartist.sthlmtraveling.provider.HistoryDbAdapter;
+import com.markupartist.sthlmtraveling.util.Tracker;
 
 public class PlannerActivity extends Activity {
     private static final String TAG = "Planner";
@@ -68,6 +69,7 @@ public class PlannerActivity extends Activity {
                 reverse();
             }
         });
+        Tracker.trackPageView("Planner");
     }
 
     protected void reverse() {

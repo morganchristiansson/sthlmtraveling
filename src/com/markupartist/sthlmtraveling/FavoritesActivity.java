@@ -26,6 +26,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import com.markupartist.sthlmtraveling.provider.FavoritesDbAdapter;
+import com.markupartist.sthlmtraveling.util.Tracker;
 
 public class FavoritesActivity extends ListActivity {
 
@@ -39,6 +40,7 @@ public class FavoritesActivity extends ListActivity {
         mFavoritesDbAdapter = new FavoritesDbAdapter(this).open();
 
         fillData();
+        Tracker.trackPageView("Favorites");
     }
 
     private void fillData() {

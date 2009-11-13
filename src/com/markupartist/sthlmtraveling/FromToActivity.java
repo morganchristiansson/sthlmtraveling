@@ -23,12 +23,13 @@ import android.widget.SimpleCursorAdapter;
 
 import com.markupartist.sthlmtraveling.planner.Planner;
 import com.markupartist.sthlmtraveling.provider.HistoryDbAdapter;
+import com.markupartist.sthlmtraveling.util.Tracker;
 
 public abstract class FromToActivity extends Activity {
     private static final String TAG = "FromTo";
     protected AutoCompleteTextView mText;
     protected ListView mRecent;
-	private HistoryDbAdapter mHistoryDbAdapter;
+    private HistoryDbAdapter mHistoryDbAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,10 +64,10 @@ public abstract class FromToActivity extends Activity {
     }
 
     @Override
-	protected void onDestroy() {
-		super.onDestroy();
+    protected void onDestroy() {
+        super.onDestroy();
         mHistoryDbAdapter.close();
-	}
+    }
 
 	protected abstract void finishOK();
     public static class FromActivity extends FromToActivity {
@@ -84,6 +85,7 @@ public abstract class FromToActivity extends Activity {
                     finishOK();
                 }
             });
+            Tracker.trackPageView("From");
         }
     
         @Override
@@ -99,6 +101,7 @@ public abstract class FromToActivity extends Activity {
         protected void onCreate(Bundle savedInstanceState) {
             setContentView(R.layout.to);
             super.onCreate(savedInstanceState);
+            Tracker.trackPageView("To");
         }
         @Override
         public void finishOK() {

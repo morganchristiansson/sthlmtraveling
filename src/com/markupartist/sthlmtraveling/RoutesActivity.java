@@ -52,6 +52,7 @@ import com.markupartist.sthlmtraveling.tasks.OnSearchRoutesResultListener;
 import com.markupartist.sthlmtraveling.tasks.SearchEarlierRoutesTask;
 import com.markupartist.sthlmtraveling.tasks.SearchLaterRoutesTask;
 import com.markupartist.sthlmtraveling.tasks.SearchRoutesTask;
+import com.markupartist.sthlmtraveling.util.Tracker;
 
 public class RoutesActivity extends ListActivity implements OnSearchRoutesResultListener {
     private final String TAG = "RoutesActivity";
@@ -98,6 +99,7 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
 
         // Search for routes
         searchRoutes();
+        Tracker.trackPageView("Routes");
     }
 
     @Override
