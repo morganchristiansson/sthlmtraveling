@@ -19,11 +19,12 @@ public class Tracker {
     private static final String CATEGORY_CLICKS = "Clicks";
     private static final String ACTION_BUTTON = "Button";
     private static final String ACTION_MENU_ITEM = "MenuItem";
-    private static GoogleAnalyticsTracker sTracker = GoogleAnalyticsTracker.getInstance();
+    private static GoogleAnalyticsTracker sTracker;
 
     private Tracker() {}
 
     public static void start(Context context) {
+        sTracker = GoogleAnalyticsTracker.getInstance();
         sTracker.start(TRACKER_ID, DEFAULT_TRACKER_INTERVAL, context);
     }
 

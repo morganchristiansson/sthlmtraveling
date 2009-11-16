@@ -30,6 +30,8 @@ public class StartActivity extends TabActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // needs to be before tabhost so that the tracker is initialized before the sub activities are called.
+        Tracker.start(getApplicationContext());
 
         final TabHost tabHost = getTabHost();
 
@@ -44,7 +46,6 @@ public class StartActivity extends TabActivity {
                 .setIndicator(getText(R.string.favorites), getResources().getDrawable(R.drawable.ic_tab_favorites))
                 .setContent(new Intent(this, FavoritesActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
-        Tracker.start(this);
     }
 
     @Override
