@@ -18,7 +18,7 @@
 -->
 
 <resources>
-    <string name="app_name">STHLM Traveling</string>
+    <string name="app_name">STHLM Traveling 2</string>
     <string name="from">From</string>
     <string name="to">To</string>
     <string name="depart">Depart</string>
