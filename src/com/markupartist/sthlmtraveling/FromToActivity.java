@@ -81,7 +81,7 @@ public abstract class FromToActivity extends Activity {
             mMyLocationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mText.setText(getAddressFromCurrentPosition(FromActivity.this));
+                    mText.setText(getAddressFromCurrentPosition());
                     finishOK();
                 }
             });
@@ -119,8 +119,8 @@ public abstract class FromToActivity extends Activity {
      * @return the address in the format "location name, street" or null if failed
      * to determine address 
      */
-    private static String getAddressFromCurrentPosition(FromActivity activity) {
-        final LocationManager lm = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+    protected String getAddressFromCurrentPosition() {
+        final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location loc = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         Location gpsLoc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
@@ -138,10 +138,11 @@ public abstract class FromToActivity extends Activity {
 
         Double lat = loc.getLatitude();
         Double lng = loc.getLongitude();
-        Geocoder geocoder = new Geocoder(activity.getApplicationContext(), Locale.getDefault());
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         String addressString = null;
         try {
             Log.d(TAG, "Getting address from position " + lat + "," + lng);
+            // TODO: Move the call for getFromLocation to a separate background thread.
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 5);
             if (!addresses.isEmpty()) {
                 for (Address address : addresses) {

@@ -27,10 +27,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -54,9 +55,33 @@ import com.markupartist.sthlmtraveling.tasks.SearchLaterRoutesTask;
 import com.markupartist.sthlmtraveling.tasks.SearchRoutesTask;
 import com.markupartist.sthlmtraveling.util.Tracker;
 
+import com.markupartist.sthlmtraveling.utils.BarcodeScannerIntegrator;
+
+/**
+ * Routes activity
+ * <br/>
+ * Accepts a routes data URI in the format:
+ * <code>journeyplanner://routes?startpoint=STARTPOINT&endpoint=ENDPOINT&time=TIME</code>
+ * All parameters needs to be url encoded. Time is optional, but if provided it must be in
+ * RFC 2445 format.
+ */
 public class RoutesActivity extends ListActivity implements OnSearchRoutesResultListener {
+    /**
+     * The start point for the search.
+     */
+    static final String EXTRA_START_POINT = "com.markupartist.sthlmtraveling.start_point";
+    /**
+     * The end point for the search.
+     */
+    static final String EXTRA_END_POINT = "com.markupartist.sthlmtraveling.end_point";
+    /**
+     * Departure time in RFC 2445 format.
+     */
+    static final String EXTRA_TIME = "com.markupartist.sthlmtraveling.time";
+
     private final String TAG = "RoutesActivity";
-    private static final int DIALOG_NO_ROUTE_DETAILS_FOUND = 0;
+
+    private static final int DIALOG_ILLEGAL_PARAMETERS = 0;
 
     private static final int ADAPTER_EARLIER = 0;
     private static final int ADAPTER_ROUTES = 1;
@@ -81,31 +106,77 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
         super.onCreate(savedInstanceState);
         setContentView(R.layout.routes_list);
 
+        // Parse data URI
+        final Uri uri = getIntent().getData();
+        String startPoint  = uri.getQueryParameter("start_point");
+        String endPoint    = uri.getQueryParameter("end_point");
+        String time        = uri.getQueryParameter("time");
+
+        if (startPoint == null || endPoint == null) {
+            showDialog(DIALOG_ILLEGAL_PARAMETERS);
+            // If passed with bad parameters, break the execution.
+            return;
+        }
+
+        mTime = new Time();
+        if (time != null ) {
+            mTime.parse(time);
+        } else {
+            mTime.setToNow();
+        }
+
         mFavoritesDbAdapter = new FavoritesDbAdapter(this).open();
 
         mFromView = (TextView) findViewById(R.id.route_from);
+        mFromView.setText(startPoint);
         mToView = (TextView) findViewById(R.id.route_to);
+        mToView.setText(endPoint);
 
         Bundle extras = getIntent().getExtras();
 
-        mFromView.setText(extras.getString("com.markupartist.sthlmtraveling.startPoint"));
-        mToView.setText(extras.getString("com.markupartist.sthlmtraveling.endPoint"));
-        setTime(extras);
-
-        mFavoriteButtonHelper = new FavoriteButtonHelper(
-                this, mFavoritesDbAdapter, 
-                mFromView.getText().toString(), mToView.getText().toString());
+        mFavoriteButtonHelper = new FavoriteButtonHelper(this, mFavoritesDbAdapter, 
+                startPoint, endPoint);
         mFavoriteButtonHelper.loadImage();
 
-        // Search for routes
-        searchRoutes();
+        initRoutes(startPoint, endPoint, mTime);
         Tracker.trackPageView("Routes");
+    }
+
+    /**
+     * Search for routes. Will first check if we already have data stored.
+     * @param startPoint the start point
+     * @param endPoint the end point
+     * @param time the time
+     */
+    private void initRoutes(String startPoint, String endPoint, Time time) {
+        @SuppressWarnings("unchecked")
+        final ArrayList<Route> routes = (ArrayList<Route>) getLastNonConfigurationInstance();
+        if (routes != null) {
+            onSearchRoutesResult(routes);
+        } else {
+            SearchRoutesTask searchRoutesTask = new SearchRoutesTask(this);
+            searchRoutesTask.setOnSearchRoutesResultListener(this);
+            searchRoutesTask.execute(startPoint, endPoint, time);
+        }
+    }
+
+    /**
+     * Called before this activity is destroyed, returns the previous details. This data is used 
+     * if the screen is rotated. Then we don't need to ask for the data again.
+     * @return route details
+     */
+    @Override
+    public Object onRetainNonConfigurationInstance() {
+        return mRouteAdapter.getRoutes();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mFavoriteButtonHelper.loadImage();
+        // Could be null if bad parameters was passed to the search.
+        if (mFavoriteButtonHelper != null) {
+            mFavoriteButtonHelper.loadImage();
+        }
     }
 
     private void createSections() {
@@ -219,9 +290,9 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
             break;
         case SECTION_CHANGE_TIME:
             Intent i = new Intent(this, WhenActivity.WithResult.class);
-            i.putExtra("com.markupartist.sthlmtraveling.routeTime", mTime.format2445());
-            //i.putExtra("com.markupartist.sthlmtraveling.startPoint", mFromView.getText());
-            //i.putExtra("com.markupartist.sthlmtraveling.endPoint", mToView.getText());
+            i.putExtra(EXTRA_TIME, mTime.format2445());
+            //i.putExtra(EXTRA_START_POINT, mFromView.getText());
+            //i.putExtra(EXTRA_END_POINT, mToView.getText());
             startActivityForResult(i, CHANGE_TIME);
             break;
         }
@@ -244,9 +315,9 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
      */
     private void findRouteDetails(final Route route) {
         Intent i = new Intent(RoutesActivity.this, RouteDetailActivity.class);
-        i.putExtra("com.markupartist.sthlmtraveling.startPoint", mFromView.getText().toString());
-        i.putExtra("com.markupartist.sthlmtraveling.endPoint", mToView.getText().toString());
-        i.putExtra("com.markupartist.sthlmtraveling.route", route);
+        i.putExtra(RouteDetailActivity.EXTRA_START_POINT, mFromView.getText().toString());
+        i.putExtra(RouteDetailActivity.EXTRA_END_POINT, mToView.getText().toString());
+        i.putExtra(RouteDetailActivity.EXTRA_ROUTE, route);
         startActivity(i);
     }
 
@@ -265,9 +336,9 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
             if (resultCode == RESULT_CANCELED) {
                 Log.d(TAG, "Change time activity cancelled.");
             } else {
-                String startPoint = data.getStringExtra("com.markupartist.sthlmtraveling.startPoint");
-                String endPoint = data.getStringExtra("com.markupartist.sthlmtraveling.endPoint");
-                String newTime = data.getStringExtra("com.markupartist.sthlmtraveling.routeTime");
+//                String startPoint = data.getStringExtra(EXTRA_START_POINT);
+//                String endPoint = data.getStringExtra(EXTRA_END_POINT);
+                String newTime = data.getStringExtra(EXTRA_TIME);
 
                 mTime.parse(newTime);
                 HashMap<String, String> item = mDateAdapterData.get(0);
@@ -276,16 +347,6 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
                 searchRoutes();
             }
         }
-    }
-
-    private void setTime(Bundle extras) {
-		String time = extras.getString("com.markupartist.sthlmtraveling.routeTime");
-		if(time != null) {
-			mTime.parse(time);
-		} else {
-			mTime = new Time();
-			mTime.setToNow();
-		}
     }
 
 	/**
@@ -326,7 +387,7 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
+        inflater.inflate(R.menu.options_menu_routes, menu);
         return true;
     }
 
@@ -338,33 +399,93 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
                 return true;
+            case R.id.reverse_start_end :
+                String startPoint = mFromView.getText().toString();
+                String endPoint = mToView.getText().toString();
+
+                /*
+                 * Note: To launch a new intent won't work because sl.se would need to have a new
+                 * ident generated to be able to search for route details in the next step.
+                 */
+
+                SearchRoutesTask searchRoutesTask = new SearchRoutesTask(this);
+                searchRoutesTask.setOnSearchRoutesResultListener(this);
+                searchRoutesTask.execute(endPoint, startPoint, mTime);
+                mFromView.setText(endPoint);
+                mToView.setText(startPoint);
+
+                // Update the favorite button
+                mFavoriteButtonHelper.setStartPoint(endPoint).setEndPoint(startPoint).loadImage();
+                return true;
+            case R.id.show_qr_code :
+                Uri routesUri = createRoutesUri(
+                        Uri.encode(mFromView.getText().toString()), 
+                        Uri.encode(mToView.getText().toString()));
+                BarcodeScannerIntegrator.shareText(this, routesUri.toString(),
+                        R.string.install_barcode_scanner_title,
+                        R.string.requires_barcode_scanner_message,
+                        R.string.yes, R.string.no);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected Dialog onCreateDialog(int id) {
-        Dialog dialog = null;
         switch(id) {
-        case DIALOG_NO_ROUTE_DETAILS_FOUND:
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            dialog = builder.setTitle("Unfortunately no route details was found")
-                .setMessage("Most likely your session has timed out.")
+        case DIALOG_ILLEGAL_PARAMETERS:
+            return new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(getText(R.string.attention_label))
+                .setMessage(getText(R.string.bad_routes_parameters_message))
                 .setCancelable(true)
-                .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                   }
-                }).create();
-            break;
+                .setNeutralButton(getText(android.R.string.ok), null)
+                .create();
         }
-        return dialog;
+        return null;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mFavoritesDbAdapter.close();
+        if (mFavoritesDbAdapter != null) {
+            mFavoritesDbAdapter.close();
+        }
+    }
+
+    /**
+     * Constructs a search routes data Uri.
+     * @param startPoint the start point
+     * @param endPoint the end point
+     * @return a search routes data uri
+     */
+    public static Uri createRoutesUri(String startPoint, String endPoint) {
+        return createRoutesUri(startPoint, endPoint, (String)null);
+    }
+
+    public static Uri createRoutesUri(String startPoint, String endPoint, Time time) {
+        return createRoutesUri(startPoint, endPoint, time.format2445());
+    }
+    /**
+     * Constructs a search routes data URI.
+     * @param startPoint the start point
+     * @param endPoint the end point
+     * @param time the time
+     * @return a search routes data URI
+     */
+    public static Uri createRoutesUri(String startPoint, String endPoint, String time) {
+        Uri routesUri;
+        if (time != null) {
+            routesUri = Uri.parse(
+                    String.format("journeyplanner://routes?start_point=%s&end_point=%s&time=%s",
+                            startPoint, endPoint, time));
+        } else {
+            routesUri = Uri.parse(
+                    String.format("journeyplanner://routes?start_point=%s&end_point=%s",
+                            startPoint, endPoint));
+        }
+
+        return routesUri;
     }
 
     private class RoutesAdapter extends BaseAdapter {
@@ -379,6 +500,10 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
 
         public void refill(ArrayList<Route> routes) {
             mRoutes = routes;
+        }
+
+        public ArrayList<Route> getRoutes() {
+            return mRoutes;
         }
 
         @Override
@@ -400,7 +525,51 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
         public View getView(int position, View convertView, ViewGroup parent) {
             Route route = mRoutes.get(position);
             return new RouteAdapterView(mContext, route);
+            //return createView(mContext, route);
         }
+
+        /*
+        private View createView(Context context, Route route) {
+            LayoutInflater inflater = (LayoutInflater)context.getSystemService(
+                    Context.LAYOUT_INFLATER_SERVICE);
+
+            View layout = inflater.inflate(R.layout.routes_row, null);
+
+            TextView startPoint = (TextView) layout.findViewById(R.id.route_startpoint_label);
+            startPoint.setText(route.from);
+            TextView startPointDeparture = (TextView) layout.findViewById(R.id.route_startpoint_departure);
+            startPointDeparture.setText(route.departure);
+
+            TextView endPoint = (TextView) layout.findViewById(R.id.route_endpoint_label);
+            endPoint.setText(route.to);
+            TextView endPointArrival = (TextView) layout.findViewById(R.id.route_endpoint_arrival);
+            endPointArrival.setText(route.arrival);
+
+            TextView durationAndChanges = (TextView) layout.findViewById(R.id.route_duration_and_changes);
+            durationAndChanges.setText(route.duration);
+
+            LinearLayout routeChangesDrawables = (LinearLayout) findViewById(R.id.route_changes);
+            int currentTransportCount = 1;
+            int transportCount = route.transports.size();
+            for (Route.Transport transport : route.transports) {
+                ImageView change = new ImageView(context);
+                change.setImageResource(transport.imageResource());
+                change.setPadding(0, 0, 5, 0);
+                routeChangesDrawables.addView(change);
+
+                if (transportCount > currentTransportCount) {
+                    ImageView separator = new ImageView(context);
+                    separator.setImageResource(R.drawable.transport_separator);
+                    separator.setPadding(0, 5, 5, 0);
+                    routeChangesDrawables.addView(separator);
+                }
+
+                currentTransportCount++;
+            }
+            
+            return layout;
+        }
+        */
     }
 
     private class RouteAdapterView extends LinearLayout {
@@ -414,17 +583,15 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
             TextView routeDetail = new TextView(context);
             routeDetail.setText(route.toString());
             routeDetail.setTextColor(Color.WHITE);
-            routeDetail.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            //routeDetail.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+
+            TextView startAndEndPoint = new TextView(context);
+            startAndEndPoint.setText(route.from + " - " + route.to);
+            startAndEndPoint.setTextColor(Color.GRAY);
+            startAndEndPoint.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
 
             LinearLayout routeChanges = new LinearLayout(context);
-            routeChanges.setPadding(0, 3, 0, 0);
-
-            /*
-            TextView changesView = new TextView(context);
-            changesView.setText(route.changes + " changes:");
-            changesView.setPadding(0, 0, 5, 0);
-            routeChanges.addView(changesView);
-            */
+            routeChanges.setPadding(0, 5, 0, 0);
 
             int currentTransportCount = 1;
             int transportCount = route.transports.size();
@@ -444,6 +611,7 @@ public class RoutesActivity extends ListActivity implements OnSearchRoutesResult
                 currentTransportCount++;
             }
 
+            this.addView(startAndEndPoint);
             this.addView(routeDetail);
             this.addView(routeChanges);
         }

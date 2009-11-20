@@ -7,6 +7,7 @@ import com.markupartist.sthlmtraveling.util.Tracker;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -42,13 +43,18 @@ public class WhenActivity extends Activity {
         mGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(WhenActivity.this.getIntent());
-                i.setClass(WhenActivity.this, RoutesActivity.class);
                 Calendar cal = Calendar.getInstance();
                 cal.add(Calendar.DAY_OF_MONTH, mDateSpinner.getSelectedItemPosition());
                 cal.set(Calendar.HOUR_OF_DAY, mTimePicker.getCurrentHour());
                 cal.set(Calendar.MINUTE, mTimePicker.getCurrentMinute());
-                i.putExtra("com.markupartist.sthlmtraveling.routeTime",
+                Intent oldi = WhenActivity.this.getIntent();
+                Uri routesUri = RoutesActivity.createRoutesUri(
+                        oldi.getStringExtra(RoutesActivity.EXTRA_START_POINT), 
+                        oldi.getStringExtra(RoutesActivity.EXTRA_END_POINT),
+                        dateFormat.format(cal.getTime()).toString());
+                Intent i = new Intent(WhenActivity.this, RoutesActivity.class)
+                                     .setData(routesUri);
+                i.putExtra(RoutesActivity.EXTRA_TIME,
                            dateFormat.format(cal.getTime()).toString());
                 myfinish(i);
             }

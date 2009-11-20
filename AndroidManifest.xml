@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.markupartist.sthlmtraveling"
-      android:versionName="1.3.0" android:versionCode="13">
+      android:versionName="1.3.6" android:versionCode="18">
     <supports-screens
         android:largeScreens="true"
         android:normalScreens="true"
@@ -27,9 +27,26 @@
         <activity android:name=".WhenActivity$WithResult"/>
         <activity android:name=".FromToActivity$FromActivity"/>
         <activity android:name=".FromToActivity$ToActivity"/>
-        <activity android:name=".RoutesActivity"/>
-        <activity android:name=".RouteDetailActivity"/>
         <activity android:name=".AboutActivity" android:label="@string/about_title"/>
+
+        <!-- Alias activity used to create shortcuts on Home. The alias is used
+             simply to have a different label. -->
+        <activity-alias android:name="SearchShortcutActivity"
+            android:targetActivity="PlannerActivity"
+            android:label="@string/activity_create_shortcut">
+            <intent-filter>
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+        <activity android:name=".RoutesActivity">
+            <intent-filter>
+	            <action android:name="android.intent.action.VIEW"/>
+	            <category android:name="android.intent.category.DEFAULT"/>
+	            <data android:scheme="journeyplanner" android:host="routes" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".RouteDetailActivity"/>
     </application>
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
     <uses-permission android:name="android.permission.INTERNET"/>

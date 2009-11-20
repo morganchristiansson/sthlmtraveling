@@ -17,10 +17,10 @@
 package com.markupartist.sthlmtraveling;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,17 +36,22 @@ public class PlannerActivity extends Activity {
     protected static final int ACTIVITY_FROM = 5;
     protected static final int ACTIVITY_TO = 6;
 
-    private static final int NO_LOCATION = 5;
     private Button mFromButton;
     private Button mToButton;
     private Button mSearchNowButton;
     private Button mSearchLaterButton;
     private ImageButton mReverseButton;
 	private HistoryDbAdapter mHistoryDbAdapter;
+    private boolean mCreateShortcut;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.planner);
+        // If the activity was started with the "create shortcut" action, we
+        // remember this to change the behavior upon a search.
+        if (Intent.ACTION_CREATE_SHORTCUT.equals(getIntent().getAction())) {
+            mCreateShortcut = true;
+        }
 
         mFromButton = (Button)findViewById(R.id.from);
         mFromButton.setOnClickListener(_fromListener);
@@ -102,9 +107,8 @@ public class PlannerActivity extends Activity {
 			mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_START_POINT, startPoint);
 			mHistoryDbAdapter.create(HistoryDbAdapter.TYPE_END_POINT, endPoint);
 
-			Intent i = new Intent(PlannerActivity.this, RoutesActivity.class);
-            i.putExtra("com.markupartist.sthlmtraveling.startPoint", startPoint);
-            i.putExtra("com.markupartist.sthlmtraveling.endPoint", endPoint);
+			Intent i = new Intent(PlannerActivity.this, RoutesActivity.class)
+			           .setData(RoutesActivity.createRoutesUri(startPoint, endPoint));
             startActivity(i);
         }
     };
@@ -113,8 +117,8 @@ public class PlannerActivity extends Activity {
         public void onClick(View v) {
             if(!validate()) return;
             Intent i = new Intent(PlannerActivity.this, WhenActivity.class);
-            i.putExtra("com.markupartist.sthlmtraveling.startPoint", mFromButton.getText().toString());
-            i.putExtra("com.markupartist.sthlmtraveling.endPoint", mToButton.getText().toString());
+            i.putExtra(RoutesActivity.EXTRA_START_POINT, mFromButton.getText().toString());
+            i.putExtra(RoutesActivity.EXTRA_END_POINT, mToButton.getText().toString());
             startActivity(i);
         }
     };
@@ -144,19 +148,28 @@ public class PlannerActivity extends Activity {
             Log.w(TAG, "Unhandled activity resultCode: "+resultCode);
         }
     }
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        Dialog dialog = null;
-        switch(id) {
-        case NO_LOCATION:
-            return new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle(getText(R.string.no_location_title))
-                .setMessage(getText(R.string.no_location_message))
-                .setPositiveButton(android.R.string.ok, null)
-                .create();
-        }
-        return dialog;
+
+    /**
+     * Setup a search short cut.
+     * @param startPoint the start point
+     * @param endPoint the end point
+     */
+    protected void onCreateShortCut(String startPoint, String endPoint) {
+        Uri routesUri = RoutesActivity.createRoutesUri(startPoint, endPoint);
+        Intent shortcutIntent = new Intent(Intent.ACTION_VIEW, routesUri,
+                this, RoutesActivity.class);
+        shortcutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        // Then, set up the container intent (the response to the caller)
+        Intent intent = new Intent();
+        intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, startPoint + " " + endPoint);
+        Parcelable iconResource = Intent.ShortcutIconResource.fromContext(
+                this, R.drawable.icon);
+        intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource);
+
+        // Now, return the result to the launcher
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     @Override

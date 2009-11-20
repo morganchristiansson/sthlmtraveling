@@ -23,18 +23,29 @@
     <string name="to">To</string>
     <string name="depart">Depart</string>
     <string name="arrive">Arrive</string>
+    <string name="search_label">Search</string>
+    <string name="departing">Departing</string>
+    <string name="arriving">Arriving</string>
+    <string name="no_routes_found_label">Unfortunately no routes was found</string>
+    <string name="no_routes_found_message">If searching for an address try adding a house number.</string>
+    <!-- TODO: is no_routes used? -->
     <string name="no_routes">Unfortunately there was no route found. Please try entering another station/stop.</string>
     <string name="no_route_details">Unfortunately there was no route found. Most likely this search was too old.</string>
+    <string name="session_timeout_message">Most likely this search was too old.</string>
+    <string name="attention_label">Attention</string>
+    <string name="bad_routes_parameters_message">Start point or end point must not be empty.</string>
     <string name="empty_value">Missing value</string>
     <string name="loading">Searching. Please wait...</string>
     <string name="from_my_location">From my location</string>
     <string name="from_map">Pick from map</string>
     <string name="change_date_and_time">Change date &amp; time</string>
+    <string name="reverse_start_end">Reverse from &amp; to</string>
     <string name="date_title">Date</string>
     <string name="time_title">Time</string>
     <string name="about">About</string>
     <string name="about_title">About STHML Traveling</string>
     <string name="donate">Donate</string>
+    <string name="donate_url">http://pledgie.com/campaigns/6527</string>
     <string name="feedback">Feedback</string>
     <string name="send_email">Send email...</string>
     <string name="favorites">Favorites</string>
@@ -53,4 +64,16 @@
     <string name="search_later">Later</string>
     <string name="network_problem_label">Network problem</string>
     <string name="network_problem_message">A network problem occurred</string>
+    <string name="activity_create_shortcut">Routes</string>
+    <string name="create_shortcut_label">Create Shortcut</string>
+    <string name="choose_start_point_label">Choose start point</string>
+    <string name="choose_end_point_label">Choose end point</string>
+    <string name="send_feedback_email_title">STHLM Traveling feedback</string>
+    <string name="send_feedback_email_emailaddress">sthlmtraveling@markupartist.com</string>
+    <string name="history_label">History</string>
+    <string name="show_qr_code">Show barcode</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="requires_barcode_scanner_message">This application requires Barcode Scanner. Would you like to install it?</string>
+    <string name="install_barcode_scanner_title">Install Barcode Scanner?</string>
 </resources>

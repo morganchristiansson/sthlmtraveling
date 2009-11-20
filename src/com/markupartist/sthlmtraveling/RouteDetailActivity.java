@@ -24,20 +24,28 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.markupartist.sthlmtraveling.planner.Route;
 import com.markupartist.sthlmtraveling.provider.FavoritesDbAdapter;
 import com.markupartist.sthlmtraveling.tasks.FindRouteDetailsTask;
+import com.markupartist.sthlmtraveling.tasks.FindRouteDetailsTask.OnNoRoutesDetailsResultListener;
 import com.markupartist.sthlmtraveling.tasks.FindRouteDetailsTask.OnRouteDetailsResultListener;
 import com.markupartist.sthlmtraveling.util.Tracker;
 
-public class RouteDetailActivity extends ListActivity implements OnRouteDetailsResultListener {
+public class RouteDetailActivity extends ListActivity 
+        implements OnRouteDetailsResultListener, OnNoRoutesDetailsResultListener {
+    public static final String EXTRA_START_POINT = "com.markupartist.sthlmtraveling.start_point";
+    public static final String EXTRA_END_POINT = "com.markupartist.sthlmtraveling.end_point";
+    public static final String EXTRA_ROUTE = "com.markupartist.sthlmtraveling.route";
+
     private ArrayAdapter<String> mDetailAdapter;
     private TextView mFromView;
     private TextView mToView;
     private FavoritesDbAdapter mFavoritesDbAdapter;
+    private ArrayList<String> mDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,17 +53,14 @@ public class RouteDetailActivity extends ListActivity implements OnRouteDetailsR
         setContentView(R.layout.route_details_list);
 
         Bundle extras = getIntent().getExtras();
-        Route route = extras.getParcelable("com.markupartist.sthlmtraveling.route");
+        Route route = extras.getParcelable(EXTRA_ROUTE);
 
-        System.out.println("route " + route.ident);
-        System.out.println("route " + route.routeId);
-        
         mFavoritesDbAdapter = new FavoritesDbAdapter(this).open();
 
         mFromView = (TextView) findViewById(R.id.route_from);
-        mFromView.setText(extras.getString("com.markupartist.sthlmtraveling.startPoint"));
+        mFromView.setText(extras.getString(EXTRA_START_POINT));
         mToView = (TextView) findViewById(R.id.route_to);
-        mToView.setText(extras.getString("com.markupartist.sthlmtraveling.endPoint"));
+        mToView.setText(extras.getString(EXTRA_END_POINT));
 
         TextView dateTimeView = (TextView) findViewById(R.id.route_date_time);
         dateTimeView.setText(route.toString());
@@ -65,16 +70,41 @@ public class RouteDetailActivity extends ListActivity implements OnRouteDetailsR
                 mFromView.getText().toString(), mToView.getText().toString());
         favoriteButtonHelper.loadImage();
 
-        FindRouteDetailsTask findRouteDetailsTask = new FindRouteDetailsTask(this);
-        findRouteDetailsTask.setOnRouteDetailsResultListener(this);
-        findRouteDetailsTask.execute(route);
+        initRouteDetails(route);
         Tracker.trackPageView("RouteDetail");
+    }
+
+    /**
+     * Find route details. Will first check if we already have data stored. 
+     * @param route
+     */
+    private void initRouteDetails(Route route) {
+        @SuppressWarnings("unchecked")
+        final ArrayList<String> details = (ArrayList<String>) getLastNonConfigurationInstance();
+        if (details != null) {
+            onRouteDetailsResult(details);
+        } else {
+            FindRouteDetailsTask findRouteDetailsTask = new FindRouteDetailsTask(this);
+            findRouteDetailsTask.setOnRouteDetailsResultListener(this);
+            findRouteDetailsTask.setOnNoResultListener(this);
+            findRouteDetailsTask.execute(route);
+        }
+    }
+
+    /**
+     * Called before this activity is destroyed, returns the previous details. This data is used 
+     * if the screen is rotated. Then we don't need to ask for the data again.
+     * @return route details
+     */
+    @Override
+    public Object onRetainNonConfigurationInstance() {
+        return mDetails;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
+        inflater.inflate(R.menu.options_menu_route_details, menu);
         return true;
     }
 
@@ -100,5 +130,12 @@ public class RouteDetailActivity extends ListActivity implements OnRouteDetailsR
     public void onRouteDetailsResult(ArrayList<String> details) {
         mDetailAdapter = new ArrayAdapter<String>(this, R.layout.route_details_row, details);
         setListAdapter(mDetailAdapter);
+        mDetails = details;
+    }
+
+    @Override
+    public void onNoRoutesDetailsResult() {
+        TextView noResult = (TextView) findViewById(R.id.route_details_no_result);
+        noResult.setVisibility(View.VISIBLE);
     }
 }
