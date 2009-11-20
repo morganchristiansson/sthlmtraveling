@@ -67,6 +67,7 @@ public class PlannerActivity extends Activity {
             @Override
             public void onClick(View v) {
                 reverse();
+                Tracker.trackPageView("Reverse");
             }
         });
         Tracker.trackPageView("Planner");
